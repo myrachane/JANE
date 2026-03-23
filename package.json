@@ -1,0 +1,10 @@
+{
+  "name": "jane-visrodeck",
+  "version": "1.8.0",
+  "private": true,
+  "description": "Jane AI — Visrodeck local AI assistant",
+  "dependencies": {
+    "ws": "^8.18.0",
+    "uuid": "^9.0.1"
+  }
+}

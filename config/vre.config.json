@@ -1,0 +1,17 @@
+{
+  "api": {
+    "ws_port": 7700
+  },
+  "llm": {
+    "llama_server_url": "http://127.0.0.1:8080",
+    "default_model": "llama3.2:3b"
+  },
+  "audit": {
+    "enabled": true,
+    "max_rows": 100000
+  },
+  "security": {
+    "session_ttl_hours": 24,
+    "approval_timeout_seconds": 60
+  }
+}
