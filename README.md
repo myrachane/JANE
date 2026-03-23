@@ -1,6 +1,5 @@
-# Jane v1.7.8 — Visrodeck AI Assistant
+# Jane v1.8.0 — Visrodeck AI Assistant
 
-100% local AI. No cloud. No Ollama. Powered by llama.cpp.
 
 ## Quick Start
 
@@ -64,10 +63,7 @@ jane-complete/
 └── package.json
 ```
 
-## Context Length Error
 
-If you see "exceeds context size (2048 tokens)" — this is fixed in v1.7.5.
-Context is now 4096 tokens.
 
 
 ## Custom Splash Logo
