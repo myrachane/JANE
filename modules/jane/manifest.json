@@ -1,0 +1,17 @@
+{
+  "id":         "visrodeck.jane",
+  "name":       "Jane",
+  "version":    "0.3.0",
+  "trust_tier": "trusted",
+  "capabilities": [
+    "fs.read", "fs.list", "fs.write", "fs.delete",
+    "shell.safe", "llm.infer",
+    "web.search", "web.fetch",
+    "voice.speak", "voice.listen",
+    "screen.capture",
+    "system.launch", "system.type"
+  ],
+  "require_approval": ["shell.danger", "fs.delete", "system.type"],
+  "deny": [],
+  "resource_limits": { "max_cpu_percent": 60, "max_memory_mb": 512 }
+}
