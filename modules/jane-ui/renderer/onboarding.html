@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+<title>Jane Setup</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070709;--s1:#0d0d12;--s2:#12121a;--s3:#18181f;
+  --b1:#1c1c26;--b2:#242430;--b3:#2e2e3e;
+  --t1:#f0f0f4;--t2:#9090a8;--t3:#50505f;
+  --acc:#7c5cfc;--acc2:#5b3fd4;--acc3:rgba(124,92,252,.1);
+  --green:#22c55e;--red:#f43f5e;--blue:#38bdf8;--yellow:#fbbf24;
+  --r:10px;--r2:14px;
+  --sans:-apple-system,'Segoe UI',system-ui,sans-serif;
+  --mono:'SF Mono','Fira Code','Cascadia Code',ui-monospace,monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);
+  font-family:var(--sans);-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
+
+/* titlebar */
+#tb{height:40px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;-webkit-app-region:drag;border-bottom:1px solid var(--b1);flex-shrink:0}
+.tb-left{display:flex;align-items:center;gap:8px;-webkit-app-region:no-drag;pointer-events:none}
+.tb-mark{width:22px;height:22px;border-radius:6px;background:var(--acc);
+  display:flex;align-items:center;justify-content:center}
+.tb-mark svg{width:12px;height:12px}
+.tb-name{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--t2);font-family:var(--mono)}
+.tb-tag{font-size:9px;letter-spacing:.08em;padding:2px 8px;border-radius:4px;
+  border:1px solid var(--b2);color:var(--t3);font-family:var(--mono)}
+.wbtns{-webkit-app-region:no-drag}
+.wbtn{width:26px;height:26px;border:none;background:transparent;border-radius:6px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--t3);transition:all .15s}
+.wbtn:hover{background:var(--s2);color:var(--t2)}
+.wbtn.x:hover{background:rgba(244,63,94,.12);color:var(--red)}
+
+/* layout */
+#shell{display:flex;flex-direction:column;height:calc(100% - 40px)}
+
+/* step dots */
+#step-bar{padding:22px 40px 0;display:flex;align-items:center;flex-shrink:0}
+.sb-wrap{display:flex;align-items:center;flex:1}
+.sb-wrap:last-child{flex:0}
+.sb-dot{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--b3);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:11px;font-weight:700;color:var(--t3);background:var(--s1);
+  transition:all .3s;position:relative;font-family:var(--mono)}
+.sb-dot.active{border-color:var(--acc);color:var(--acc);box-shadow:0 0 0 4px rgba(124,92,252,.1)}
+.sb-dot.done{background:var(--acc);border-color:var(--acc);color:#fff;font-size:0}
+.sb-dot.done::after{content:'✓';font-size:12px}
+.sb-line{flex:1;height:1px;background:var(--b2);margin:0 8px;transition:background .4s}
+.sb-line.done{background:var(--acc)}
+
+/* content */
+#content{flex:1;overflow-y:auto;padding:24px 40px 8px;
+  scrollbar-width:thin;scrollbar-color:var(--b2) transparent}
+#content::-webkit-scrollbar{width:3px}
+#content::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.step{display:none}
+.step.active{display:block;animation:up .2s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:9px;letter-spacing:.1em;color:var(--acc);
+  background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.18);
+  border-radius:20px;padding:3px 10px;margin-bottom:12px}
+.tag::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--acc)}
+.step-h{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:5px}
+.step-s{font-size:12.5px;color:var(--t2);margin-bottom:20px;line-height:1.6;max-width:380px}
+
+/* GPU cards — FIXED: no nested pointer-events issues */
+.gpu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gc{border:1.5px solid var(--b2);border-radius:var(--r2);padding:18px 16px;
+  cursor:pointer;transition:border-color .18s,background .18s;background:var(--s1);
+  position:relative;overflow:hidden;-webkit-app-region:no-drag}
+.gc:hover{border-color:var(--b3);background:var(--s2)}
+.gc.sel{border-color:var(--acc);background:rgba(124,92,252,.06)}
+.gc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.gc-ico{width:42px;height:42px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center}
+.gc-chk{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--b3);
+  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
+  background:var(--bg)}
+.gc.sel .gc-chk{background:var(--acc);border-color:var(--acc)}
+.gc-chk-inner{opacity:0;transition:opacity .15s}
+.gc.sel .gc-chk-inner{opacity:1}
+.gc-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.gc-sub{font-size:11px;color:var(--t3);line-height:1.4;margin-bottom:8px}
+.gc-badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.06em;
+  padding:2px 8px;border-radius:4px;font-weight:700}
+
+/* CPU */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.it{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:13px 15px}
+.it-l{font-size:9px;font-family:var(--mono);letter-spacing:.1em;color:var(--t3);margin-bottom:4px}
+.it-v{font-size:13px;font-weight:600;font-family:var(--mono);color:var(--t1)}
+.thread-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);padding:18px 20px}
+.tc-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.tc-lbl{font-size:13px;font-weight:600}
+.tc-num{font-size:22px;font-weight:800;font-family:var(--mono);color:var(--acc)}
+.tc-sub{font-size:11px;color:var(--t3);margin-bottom:14px}
+input[type=range]{width:100%;height:3px;-webkit-appearance:none;appearance:none;
+  background:var(--b2);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;
+  border-radius:50%;background:var(--acc);cursor:pointer;
+  box-shadow:0 0 0 4px rgba(124,92,252,.18);transition:box-shadow .15s}
+input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 6px rgba(124,92,252,.25)}
+.tc-ends{display:flex;justify-content:space-between;margin-top:8px;
+  font-size:10px;font-family:var(--mono);color:var(--t3)}
+
+/* Deps */
+.dep-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.dep-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);
+  padding:13px 15px;display:flex;align-items:center;gap:12px;transition:border-color .2s}
+.dep-card.ok{border-color:rgba(34,197,94,.2)}
+.dep-ico{width:36px;height:36px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dep-info{flex:1;min-width:0}
+.dep-name{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.dep-path{font-size:10px;font-family:var(--mono);color:var(--t3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dbadge{font-family:var(--mono);font-size:10px;font-weight:700;
+  padding:4px 10px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.dbadge.ok{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.dbadge.miss{background:rgba(244,63,94,.08);color:var(--red);border:1px solid rgba(244,63,94,.15)}
+.dbadge.chk{background:rgba(124,92,252,.1);color:#a78bfa;border:1px solid rgba(124,92,252,.2)}
+.dbadge.opt{background:var(--s3);color:var(--t3);border:1px solid var(--b2)}
+.dep-hint{background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.15);
+  border-radius:var(--r);padding:12px 14px;font-size:12px;color:var(--t2);line-height:1.7}
+.dep-hint.ok{background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.15)}
+.dep-hint b{color:var(--yellow)}
+.dep-hint.ok b{color:var(--green)}
+
+/* Persona */
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg.full{grid-column:1/-1}
+.fl{font-size:9px;font-family:var(--mono);letter-spacing:.1em;color:var(--t3)}
+.fi{background:var(--s1);border:1.5px solid var(--b2);border-radius:var(--r);
+  padding:10px 13px;color:var(--t1);font-size:13px;font-family:var(--sans);
+  outline:none;transition:border-color .15s,box-shadow .15s;width:100%;
+  -webkit-user-select:text;user-select:text}
+.fi:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(124,92,252,.1)}
+.fi::placeholder{color:var(--t3)}
+.tone-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tcard{border:1.5px solid var(--b2);border-radius:var(--r);padding:10px 12px;
+  cursor:pointer;transition:all .15s;background:var(--s1);-webkit-app-region:no-drag}
+.tcard:hover{border-color:var(--b3);background:var(--s2)}
+.tcard.sel{border-color:var(--acc);background:rgba(124,92,252,.07)}
+.tcard .tn{font-size:12px;font-weight:700;margin-bottom:2px}
+.tcard .td{font-size:10px;color:var(--t3)}
+.tcard.sel .tn{color:#c4b5fd}
+
+/* footer */
+#footer{padding:12px 40px 20px;display:flex;align-items:center;
+  justify-content:space-between;border-top:1px solid var(--b1);flex-shrink:0;
+  -webkit-app-region:no-drag}
+.skip{background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;
+  font-family:var(--sans);transition:color .15s;padding:8px 0}
+.skip:hover{color:var(--t2)}
+.btns{display:flex;gap:8px}
+.bback{display:none;background:none;border:1.5px solid var(--b2);color:var(--t2);
+  font-size:12px;font-weight:600;padding:9px 18px;border-radius:var(--r);
+  cursor:pointer;font-family:var(--sans);transition:all .15s}
+.bback:hover{border-color:var(--b3);color:var(--t1)}
+.bnext{background:var(--acc);border:none;color:#fff;font-size:12px;font-weight:700;
+  padding:9px 22px;border-radius:var(--r);cursor:pointer;font-family:var(--sans);
+  transition:all .15s;letter-spacing:.02em}
+.bnext:hover:not(:disabled){background:var(--acc2);transform:translateY(-1px);
+  box-shadow:0 4px 16px rgba(124,92,252,.35)}
+.bnext:disabled{background:var(--b2);color:var(--t3);cursor:not-allowed}
+.bapply{display:none;background:linear-gradient(135deg,var(--acc),#3b82f6);
+  border:none;color:#fff;font-size:12px;font-weight:700;padding:9px 22px;
+  border-radius:var(--r);cursor:pointer;font-family:var(--sans);letter-spacing:.02em;
+  transition:all .15s;box-shadow:0 4px 16px rgba(124,92,252,.22)}
+.bapply:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(124,92,252,.4)}
+.bapply:disabled{opacity:.5;cursor:not-allowed;transform:none}
+</style>
+</head>
+<body>
+
+<div id="tb">
+  <div class="tb-left">
+    <div class="tb-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <span class="tb-name">JANE</span>
+    <span class="tb-tag" id="tb-tag">SETUP</span>
+  </div>
+  <div class="wbtns">
+    <button class="wbtn x" id="close-btn">
+      <svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M1 1l7 7M8 1l-7 7"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div id="shell">
+
+  <div id="step-bar">
+    <div class="sb-wrap">
+      <div class="sb-dot active" id="d0">1</div>
+      <div class="sb-line" id="l0"></div>
+    </div>
+    <div class="sb-wrap">
+      <div class="sb-dot" id="d1">2</div>
+      <div class="sb-line" id="l1"></div>
+    </div>
+    <div class="sb-wrap">
+      <div class="sb-dot" id="d2">3</div>
+      <div class="sb-line" id="l2"></div>
+    </div>
+    <div class="sb-wrap">
+      <div class="sb-dot" id="d3">4</div>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- Step 0: GPU -->
+    <div class="step active" id="step-0">
+      <div class="tag">Step 1 of 4 · Hardware</div>
+      <div class="step-h">What GPU are you running?</div>
+      <div class="step-s">Jane downloads the right binary automatically — CUDA for NVIDIA, Vulkan for AMD / Intel.</div>
+      <div class="gpu-grid">
+
+        <div class="gc" id="gc-nvidia" data-gpu="nvidia">
+          <div class="gc-top">
+            <div class="gc-ico" style="background:rgba(118,185,0,.1)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M4 9v6l2 1.2V13l3 1.8v-2l-3-1.8v-1.2L9 11.4V9L4 9z" fill="#76b900"/>
+                <path d="M9 7l6 3.5v2.2L9 9.2V7zm6 3.5l5 3v2L15 12.7v-2.2z" fill="#76b900" opacity=".65"/>
+              </svg>
+            </div>
+            <div class="gc-chk">
+              <svg class="gc-chk-inner" width="9" height="7" viewBox="0 0 9 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 3.5l2.5 2.5L8 1"/>
+              </svg>
+            </div>
+          </div>
+          <div class="gc-name">NVIDIA</div>
+          <div class="gc-sub">GeForce RTX / GTX</div>
+          <div class="gc-badge" style="background:rgba(118,185,0,.1);color:#76b900;border:1px solid rgba(118,185,0,.2)">CUDA 12</div>
+        </div>
+
+        <div class="gc" id="gc-amd" data-gpu="amd">
+          <div class="gc-top">
+            <div class="gc-ico" style="background:rgba(237,28,36,.1)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#ed1c24">
+                <path d="M3 5h5l2.5 5L13 5h5v14h-3V9.5L13 15H11L8 9.5V19H3V5z"/>
+              </svg>
+            </div>
+            <div class="gc-chk">
+              <svg class="gc-chk-inner" width="9" height="7" viewBox="0 0 9 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 3.5l2.5 2.5L8 1"/>
+              </svg>
+            </div>
+          </div>
+          <div class="gc-name">AMD</div>
+          <div class="gc-sub">Radeon RX series</div>
+          <div class="gc-badge" style="background:rgba(237,28,36,.09);color:#f87171;border:1px solid rgba(237,28,36,.2)">VULKAN</div>
+        </div>
+
+        <div class="gc" id="gc-intel" data-gpu="intel">
+          <div class="gc-top">
+            <div class="gc-ico" style="background:rgba(0,113,197,.1)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#0071c5">
+                <rect x="4" y="4" width="5.5" height="16" rx="1.5"/>
+                <rect x="14" y="4" width="5.5" height="7" rx="1.5"/>
+                <rect x="14" y="13" width="5.5" height="7" rx="1.5" opacity=".45"/>
+              </svg>
+            </div>
+            <div class="gc-chk">
+              <svg class="gc-chk-inner" width="9" height="7" viewBox="0 0 9 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 3.5l2.5 2.5L8 1"/>
+              </svg>
+            </div>
+          </div>
+          <div class="gc-name">Intel</div>
+          <div class="gc-sub">Arc / Iris Xe / UHD</div>
+          <div class="gc-badge" style="background:rgba(0,113,197,.1);color:#60a5fa;border:1px solid rgba(0,113,197,.2)">VULKAN</div>
+        </div>
+
+        <div class="gc" id="gc-cpu" data-gpu="cpu">
+          <div class="gc-top">
+            <div class="gc-ico" style="background:rgba(148,163,184,.07)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round">
+                <rect x="7" y="7" width="10" height="10" rx="1.5"/>
+                <line x1="7" y1="10" x2="4" y2="10"/><line x1="7" y1="14" x2="4" y2="14"/>
+                <line x1="17" y1="10" x2="20" y2="10"/><line x1="17" y1="14" x2="20" y2="14"/>
+                <line x1="10" y1="7" x2="10" y2="4"/><line x1="14" y1="7" x2="14" y2="4"/>
+                <line x1="10" y1="17" x2="10" y2="20"/><line x1="14" y1="17" x2="14" y2="20"/>
+              </svg>
+            </div>
+            <div class="gc-chk">
+              <svg class="gc-chk-inner" width="9" height="7" viewBox="0 0 9 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 3.5l2.5 2.5L8 1"/>
+              </svg>
+            </div>
+          </div>
+          <div class="gc-name">CPU Only</div>
+          <div class="gc-sub">No dedicated GPU</div>
+          <div class="gc-badge" style="background:rgba(148,163,184,.07);color:var(--t3);border:1px solid var(--b2)">AVX2</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Step 1: CPU -->
+    <div class="step" id="step-1">
+      <div class="tag">Step 2 of 4 · CPU</div>
+      <div class="step-h">CPU configuration</div>
+      <div class="step-s">More threads = faster inference, but higher CPU load. GPU does the heavy math.</div>
+      <div class="info-grid">
+        <div class="it" style="grid-column:1/-1">
+          <div class="it-l">PROCESSOR</div>
+          <div class="it-v" id="ci-model" style="font-size:12px;font-family:var(--sans)">Detecting…</div>
+        </div>
+        <div class="it">
+          <div class="it-l">LOGICAL CORES</div>
+          <div class="it-v" id="ci-threads">—</div>
+        </div>
+        <div class="it">
+          <div class="it-l">SYSTEM RAM</div>
+          <div class="it-v" id="ci-ram">—</div>
+        </div>
+      </div>
+      <div class="thread-card">
+        <div class="tc-hdr">
+          <div>
+            <div class="tc-lbl">Threads for Jane</div>
+          </div>
+          <div class="tc-num" id="thread-val">6</div>
+        </div>
+        <div class="tc-sub">Drag to set — GPU offloads most work so fewer threads are fine</div>
+        <input type="range" id="thread-slider" min="1" max="16" value="6">
+        <div class="tc-ends"><span>1 · quiet</span><span>16 · max</span></div>
+      </div>
+    </div>
+
+    <!-- Step 2: Deps -->
+    <div class="step" id="step-2">
+      <div class="tag">Step 3 of 4 · Binaries</div>
+      <div class="step-h">Checking dependencies</div>
+      <div class="step-s">Jane auto-downloads missing binaries on first launch. Whisper is optional.</div>
+      <div class="dep-list">
+        <div class="dep-card" id="dc-llama">
+          <div class="dep-ico" style="background:rgba(124,92,252,.1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round">
+              <polygon points="5,3 19,12 5,21"/>
+            </svg>
+          </div>
+          <div class="dep-info">
+            <div class="dep-name">llama-server</div>
+            <div class="dep-path" id="llama-path">~/.visrodeck/bin/</div>
+          </div>
+          <div class="dbadge chk" id="llama-badge">checking…</div>
+        </div>
+        <div class="dep-card" id="dc-whisper">
+          <div class="dep-ico" style="background:rgba(34,197,94,.1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round">
+              <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+              <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+            </svg>
+          </div>
+          <div class="dep-info">
+            <div class="dep-name">whisper-server <span style="color:var(--t3);font-size:10px;font-weight:400">optional</span></div>
+            <div class="dep-path" id="whisper-path">dependencies/whisper.cpp/</div>
+          </div>
+          <div class="dbadge chk" id="whisper-badge">checking…</div>
+        </div>
+        <div class="dep-card" id="dc-wmodel">
+          <div class="dep-ico" style="background:rgba(56,189,248,.1)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div class="dep-info">
+            <div class="dep-name">Whisper model <span style="color:var(--t3);font-size:10px;font-weight:400">optional</span></div>
+            <div class="dep-path" id="wmodel-path">assets/models/ggml-base.en.bin</div>
+          </div>
+          <div class="dbadge chk" id="wmodel-badge">checking…</div>
+        </div>
+      </div>
+      <div class="dep-hint" id="dep-hint">Scanning your system…</div>
+    </div>
+
+    <!-- Step 3: Persona -->
+    <div class="step" id="step-3">
+      <div class="tag">Step 4 of 4 · Personalise</div>
+      <div class="step-h">Make Jane yours</div>
+      <div class="step-s">How should Jane address you, and how should she sound? Change any time in Settings.</div>
+      <div class="pg">
+        <div class="fg">
+          <label class="fl">YOUR NAME</label>
+          <input class="fi" id="inp-user" type="text" placeholder="e.g. Lewda" maxlength="32" autocomplete="off">
+        </div>
+        <div class="fg">
+          <label class="fl">ASSISTANT NAME</label>
+          <input class="fi" id="inp-ai" type="text" placeholder="Jane" maxlength="32" autocomplete="off">
+        </div>
+        <div class="fg full">
+          <label class="fl">WAKE WORD</label>
+          <input class="fi" id="inp-wake" type="text" placeholder="Hey Jane" maxlength="48" autocomplete="off">
+        </div>
+      </div>
+      <div class="fl" style="margin-bottom:10px">RESPONSE TONE</div>
+      <div class="tone-row">
+        <div class="tcard sel" data-tone="balanced"><div class="tn">Balanced</div><div class="td">Warm + precise</div></div>
+        <div class="tcard" data-tone="casual"><div class="tn">Casual</div><div class="td">Like a friend</div></div>
+        <div class="tcard" data-tone="professional"><div class="tn">Professional</div><div class="td">Formal, thorough</div></div>
+        <div class="tcard" data-tone="direct"><div class="tn">Direct</div><div class="td">No fluff, fast</div></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <div id="footer">
+    <button class="skip" id="skip-btn">Skip setup</button>
+    <div class="btns">
+      <button class="bback" id="back-btn">← Back</button>
+      <button class="bnext" id="next-btn" disabled>Continue →</button>
+      <button class="bapply" id="apply-btn">Launch Jane ✦</button>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+'use strict';
+// Use the contextBridge API — nodeIntegration is OFF, require('electron') won't work
+const api = window.jane;
+
+let step = 0, selectedGPU = null, threads = 6, tone = 'balanced';
+const STEPS = 4;
+
+const urlParams   = new URLSearchParams(window.location.search);
+const isReconfig  = urlParams.get('mode') === 'settings';
+if (isReconfig) document.getElementById('tb-tag').textContent = 'RECONFIGURE';
+
+// ── Progress ────────────────────────────────────────────────
+function updateDots(s) {
+  for (let i = 0; i < STEPS; i++) {
+    const d = document.getElementById('d' + i);
+    d.classList.toggle('active', i === s);
+    d.classList.toggle('done',   i < s);
+    if (i < STEPS - 1) document.getElementById('l' + i).classList.toggle('done', i < s);
+  }
+}
+
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  updateDots(n);
+  const back  = document.getElementById('back-btn');
+  const next  = document.getElementById('next-btn');
+  const apply = document.getElementById('apply-btn');
+  const skip  = document.getElementById('skip-btn');
+  back.style.display  = n > 0 ? 'block' : 'none';
+  apply.style.display = n === STEPS - 1 ? 'block' : 'none';
+  next.style.display  = n < STEPS - 1 ? 'block' : 'none';
+  skip.textContent    = isReconfig ? 'Cancel' : (n === STEPS - 1 ? 'Skip personalisation' : 'Skip setup');
+  next.disabled = (n === 0 && !selectedGPU);
+  if (n === 1) { next.disabled = false; loadCPU(); }
+  if (n === 2) { next.disabled = false; checkDeps(); }
+  if (n === 3)   next.disabled = false;
+}
+
+// ── GPU cards ────────────────────────────────────────────────
+document.querySelectorAll('.gc').forEach(card => {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.gc').forEach(c => c.classList.remove('sel'));
+    this.classList.add('sel');
+    selectedGPU = this.dataset.gpu;
+    document.getElementById('next-btn').disabled = false;
+  });
+});
+
+// ── CPU ──────────────────────────────────────────────────────
+async function loadCPU() {
+  try {
+    const info = await api.getCpuInfo();
+    document.getElementById('ci-model').textContent   = info.model   || 'Unknown';
+    document.getElementById('ci-threads').textContent = info.threads || '—';
+    document.getElementById('ci-ram').textContent     = info.ramGB ? info.ramGB + ' GB' : '—';
+    const max = Math.min(info.threads || 12, 16);
+    const def = Math.max(1, Math.floor((info.threads || 8) * 0.6));
+    const sl = document.getElementById('thread-slider');
+    sl.max = max; sl.value = def; threads = def;
+    document.getElementById('thread-val').textContent = def;
+  } catch {}
+}
+document.getElementById('thread-slider').addEventListener('input', e => {
+  threads = parseInt(e.target.value);
+  document.getElementById('thread-val').textContent = e.target.value;
+});
+
+// ── Deps ─────────────────────────────────────────────────────
+async function checkDeps() {
+  ['llama','whisper','wmodel'].forEach(id => setBadge(id, 'chk', 'checking…'));
+  try {
+    const r = await api.checkDeps(selectedGPU || 'cpu');
+    const gpuLabel = { nvidia:'CUDA', amd:'Vulkan', intel:'Vulkan', cpu:'AVX2' }[selectedGPU] || 'CPU';
+
+    setBadge('llama',   r.llama        ? 'ok'  : 'miss', r.llama        ? 'FOUND ✓' : 'MISSING');
+    setBadge('whisper', r.whisper      ? 'ok'  : 'opt',  r.whisper      ? 'FOUND ✓' : 'OPTIONAL');
+    setBadge('wmodel',  r.whisperModel ? 'ok'  : 'opt',  r.whisperModel ? 'FOUND ✓' : 'OPTIONAL');
+
+    if (r.llamaPath)        document.getElementById('llama-path').textContent   = r.llamaPath;
+    if (r.whisperPath)      document.getElementById('whisper-path').textContent = r.whisperPath;
+    if (r.whisperModelPath) document.getElementById('wmodel-path').textContent  = r.whisperModelPath;
+
+    document.getElementById('dc-llama').classList.toggle('ok',   !!r.llama);
+    document.getElementById('dc-whisper').classList.toggle('ok', !!r.whisper);
+    document.getElementById('dc-wmodel').classList.toggle('ok',  !!r.whisperModel);
+
+    const hint = document.getElementById('dep-hint');
+    if (!r.llama) {
+      hint.className = 'dep-hint';
+      hint.innerHTML = `⚠️ llama-server not found — Jane will auto-download the <b>${gpuLabel}</b> build on first launch. Or place it manually in <b>dependencies/llama.cpp/${r.sub || 'cpu'}/</b>`;
+    } else {
+      hint.className = 'dep-hint ok';
+      hint.innerHTML = r.whisper
+        ? `<b>✓ All systems go</b> — llama-server + Whisper ready. Full voice transcription enabled.`
+        : `<b>✓ llama-server ready</b> — Whisper optional, voice falls back to Windows SAPI.`;
+    }
+  } catch {
+    ['llama','whisper','wmodel'].forEach(id => setBadge(id, 'miss', 'ERROR'));
+  }
+}
+
+function setBadge(id, cls, txt) {
+  const el = document.getElementById(id + '-badge');
+  if (el) { el.className = 'dbadge ' + cls; el.textContent = txt; }
+}
+
+// ── Tone ─────────────────────────────────────────────────────
+document.querySelectorAll('.tcard').forEach(tc => {
+  tc.addEventListener('click', function() {
+    document.querySelectorAll('.tcard').forEach(c => c.classList.remove('sel'));
+    this.classList.add('sel');
+    tone = this.dataset.tone;
+  });
+});
+
+// ── Nav ──────────────────────────────────────────────────────
+document.getElementById('next-btn').addEventListener('click',  () => { if (step < STEPS - 1) { step++; showStep(step); } });
+document.getElementById('back-btn').addEventListener('click',  () => { if (step > 0) { step--; showStep(step); } });
+document.getElementById('skip-btn').addEventListener('click',  skipOnboarding);
+document.getElementById('apply-btn').addEventListener('click', applyAndFinish);
+document.getElementById('close-btn').addEventListener('click', skipOnboarding);
+
+// ── Apply ─────────────────────────────────────────────────────
+async function applyAndFinish() {
+  const btn = document.getElementById('apply-btn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  const userName = document.getElementById('inp-user').value.trim() || 'User';
+  const aiName   = document.getElementById('inp-ai').value.trim()   || 'Jane';
+  const wakeWord = document.getElementById('inp-wake').value.trim() || ('Hey ' + aiName);
+  try {
+    await api.setupComplete({ gpu: selectedGPU || 'cpu', threads, userName, aiName, wakeWord, tone, onboardDone: true });
+  } catch {}
+  window.close();
+}
+
+async function skipOnboarding() {
+  if (isReconfig) { window.close(); return; }
+  try { await api.setupComplete({ onboardDone: true, skipped: true }); } catch {}
+  window.close();
+}
+
+// ── Init: pre-fill from saved prefs ──────────────────────────
+showStep(0);
+api.getPrefs().then(p => {
+  if (p.gpu) {
+    document.querySelectorAll('.gc').forEach(c => c.classList.remove('sel'));
+    const card = document.getElementById('gc-' + p.gpu);
+    if (card) { card.classList.add('sel'); selectedGPU = p.gpu; document.getElementById('next-btn').disabled = false; }
+  }
+  if (p.userName && p.userName !== 'User') document.getElementById('inp-user').value = p.userName;
+  if (p.aiName   && p.aiName   !== 'Jane') document.getElementById('inp-ai').value   = p.aiName;
+  if (p.wakeWord) document.getElementById('inp-wake').value = p.wakeWord;
+  if (p.threads) {
+    const sl = document.getElementById('thread-slider');
+    sl.value = p.threads; threads = parseInt(p.threads);
+    document.getElementById('thread-val').textContent = p.threads;
+  }
+  if (p.tone) {
+    document.querySelectorAll('.tcard').forEach(c => c.classList.remove('sel'));
+    const tc = document.querySelector('.tcard[data-tone="' + p.tone + '"]');
+    if (tc) { tc.classList.add('sel'); tone = p.tone; }
+  }
+}).catch(() => {});
+</script>
+</body>
+</html>

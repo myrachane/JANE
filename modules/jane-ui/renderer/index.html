@@ -1,0 +1,3317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'unsafe-inline';">
+<title>Jane — Visrodeck</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #080808; --s1: #0e0e0e; --s2: #111111; --s3: #161616;
+  --b1: #1a1a1a; --b2: #242424; --b3: #2e2e2e;
+  --purple: #7c3aed; --purple2: #6d28d9;
+  --purple3: rgba(124,58,237,.12); --purple4: rgba(124,58,237,.06); --purple-g: rgba(124,58,237,.25);
+  --t1: #ffffff; --t2: #b0b0b0; --t3: #707070; --t4: #505050;
+  --green: #22c55e; --red: #ef4444; --amber: #f59e0b;
+  --nav-w: 52px; --tb-h: 38px;
+  --mono: 'Space Mono', monospace; --sans: 'Inter', sans-serif;
+  --r: 8px; --r2: 12px;
+}
+
+/* ── THEME OVERRIDES ── */
+body.theme-white {
+  --bg: #f5f5f7; --s1: #ffffff; --s2: #efefef; --s3: #e5e5ea;
+  --b1: #d1d1d6; --b2: #c7c7cc; --b3: #aeaeb2;
+  --t1: #1c1c1e; --t2: #3a3a3c; --t3: #636366; --t4: #8e8e93;
+  --purple: #6d28d9; --purple2: #5b21b6; --purple3: rgba(109,40,217,.1); --purple4: rgba(109,40,217,.08);
+  --amber: #b45309; --green: #15803d; --red: #b91c1c;
+}
+/* Override ALL hardcoded dark colours used in index.html */
+body.theme-white .bub          { color: var(--t1) !important; }
+body.theme-white .mr.user .bub { background: #ede9fe; border-color: #ddd6fe; color: #2e1065; }
+body.theme-white .mr.jane .bub { background: #ffffff; border-color: var(--b1); color: var(--t1); box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+body.theme-white .bub code     { background: rgba(109,40,217,.08); color: #6d28d9; }
+body.theme-white .bub pre      { background: #f0f0f3; border-color: var(--b1); color: var(--t1); }
+body.theme-white .tc-pre       { color: var(--t2); }
+body.theme-white .tc-name      { color: var(--amber); }
+body.theme-white .tc.ok .tc-name  { color: var(--green); }
+body.theme-white .tc.fail .tc-name{ color: var(--red); }
+body.theme-white #msg-in       { color: var(--t1); }
+body.theme-white .hs-in        { color: var(--t1); }
+body.theme-white .a-in         { color: var(--t1); }
+body.theme-white .ibar         { background: var(--s1); border-color: var(--b1); }
+body.theme-white .sc-h         { color: var(--t2); border-color: var(--b1); }
+body.theme-white .sr-l         { color: var(--t1); }
+body.theme-white .sr-s         { color: var(--t3); }
+body.theme-white .sr           { border-color: var(--b1); }
+body.theme-white .lic-k        { color: var(--t3); }
+body.theme-white .lic-v        { color: var(--t1); }
+body.theme-white .ph-title     { color: var(--t1); }
+body.theme-white .ph-sub       { color: var(--t3); }
+body.theme-white .hi-item      { border-color: var(--b1); }
+body.theme-white .hi-item:hover{ background: var(--s3); }
+body.theme-white .hi-t         { color: var(--t1); }
+body.theme-white .hi-s         { color: var(--t3); }
+body.theme-white .mode-badge   { background: var(--s2); border-color: var(--b1); color: var(--t3); }
+body.theme-white .mode-badge.active{ background: rgba(109,40,217,.08); border-color: rgba(109,40,217,.3); color: #6d28d9; }
+body.theme-white .tb-brand, body.theme-white #m-name { color: var(--t2); }
+body.theme-white .wbtn         { color: var(--t3); }
+body.theme-white .wbtn:hover   { background: var(--s2); color: var(--t1); }
+body.theme-white .chip         { border-color: var(--b1); color: var(--t2); }
+body.theme-white .chip:hover   { border-color: var(--purple); color: var(--purple); background: var(--purple3); }
+body.theme-white .ni           { color: var(--t2); }
+body.theme-white .ni:hover, body.theme-white .ni.active { background: var(--s2); color: var(--t1); }
+body.theme-white .tune-tile    { background: var(--s2); border-color: var(--b1); }
+body.theme-white .tune-k       { color: var(--t3); }
+body.theme-white .tune-v       { color: var(--purple); }
+body.theme-white .thk-dots     { background: var(--s1); border-color: var(--b1); }
+body.theme-white .thk-lbl      { color: var(--t3); }
+body.theme-white .mts          { color: var(--t3); }
+
+*,*::before,*::after { box-sizing:border-box;margin:0;padding:0; }
+html,body { height:100%;overflow:hidden; }
+body { font-family:var(--sans);background:var(--bg);color:var(--t1);font-size:13.5px;line-height:1.6;-webkit-font-smoothing:antialiased;user-select:none; }
+
+/* ── Layout ── */
+#app { display:flex;flex-direction:column;height:100vh; }
+#tb {
+  height:var(--tb-h);background:var(--bg);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;padding:0 14px;gap:12px;
+  -webkit-app-region:drag;flex-shrink:0;z-index:100;
+}
+.tb-brand { font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--t2);display:flex;align-items:center;gap:8px; }
+.tb-sep { flex:1; }
+
+/* Titlebar waveform */
+#tb-wave { display:none;align-items:center;gap:2.5px;-webkit-app-region:no-drag; }
+#tb-wave.on { display:flex; }
+#tb-wave .b { width:2px;background:var(--purple);border-radius:1px;animation:wv .85s ease-in-out infinite; }
+#tb-wave .b:nth-child(1){height:4px;animation-delay:0s}#tb-wave .b:nth-child(2){height:9px;animation-delay:.07s}
+#tb-wave .b:nth-child(3){height:15px;animation-delay:.14s}#tb-wave .b:nth-child(4){height:20px;animation-delay:.21s}
+#tb-wave .b:nth-child(5){height:24px;animation-delay:.28s}#tb-wave .b:nth-child(6){height:20px;animation-delay:.35s}
+#tb-wave .b:nth-child(7){height:15px;animation-delay:.42s}#tb-wave .b:nth-child(8){height:9px;animation-delay:.49s}
+#tb-wave .b:nth-child(9){height:4px;animation-delay:.56s}
+@keyframes wv{0%,100%{transform:scaleY(.25);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+
+/* ── Model pill ── */
+#m-pill {
+  -webkit-app-region:no-drag;display:flex;align-items:center;gap:7px;
+  padding:5px 12px;background:var(--s2);border:1px solid var(--b2);
+  border-radius:8px;cursor:pointer;transition:all .15s;
+}
+#m-pill:hover { border-color:var(--purple);background:var(--purple4); }
+.m-dot { width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);flex-shrink:0; }
+#m-name { font-family:var(--mono);font-size:10px;color:var(--t2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.m-pill-icon { color:var(--t3); }
+
+/* Window controls */
+.wbtns { display:flex;gap:3px;-webkit-app-region:no-drag; }
+.wbtn { width:26px;height:26px;border:none;background:transparent;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:10px;transition:all .15s; }
+.wbtn:hover { background:var(--s3);color:var(--t2); }
+.wbtn.x:hover { background:rgba(239,68,68,.1);color:var(--red); }
+
+/* ── MODEL MODAL ── */
+#model-modal {
+  position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;
+  background:rgba(4,4,4,.88);backdrop-filter:blur(10px);
+}
+#model-modal.open { display:flex;animation:fi .18s; }
+@keyframes fi{from{opacity:0}}
+.mm-panel {
+  background:var(--s1);border:1px solid var(--b2);border-radius:18px;
+  width:540px;max-width:94vw;overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.85),0 0 0 1px rgba(124,58,237,.15);
+  animation:su .2s ease-out;
+}
+@keyframes su{from{transform:translateY(14px);opacity:0}}
+.mm-hdr {
+  display:flex;align-items:center;gap:10px;padding:20px 24px 16px;
+  border-bottom:1px solid var(--b1);
+}
+.mm-hdr-icon { width:20px;height:20px;fill:#7c3aed;flex-shrink:0; }
+.mm-hdr-title { font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--t1);flex:1; }
+.mm-hdr-sub { font-size:11px;color:var(--t3); }
+.mm-close {
+  width:28px;height:28px;border:none;background:transparent;border-radius:6px;
+  cursor:pointer;color:var(--t3);display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.mm-close:hover { background:rgba(239,68,68,.1);color:var(--red); }
+.mm-close svg { width:10px;height:10px; }
+
+.mm-cards { padding:14px; display:flex;flex-direction:column;gap:10px; }
+.mm-card {
+  display:flex;align-items:center;gap:16px;
+  padding:16px 18px;background:var(--bg);border:1px solid var(--b1);
+  border-radius:var(--r2);cursor:pointer;transition:all .18s;
+  position:relative;overflow:hidden;
+}
+.mm-card::before {
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:transparent;transition:background .18s;
+}
+.mm-card:hover { border-color:var(--b3);background:var(--s1); }
+.mm-card:hover::before { background:var(--b3); }
+.mm-card.cur { border-color:rgba(124,58,237,.4);background:var(--purple4); }
+.mm-card.cur::before { background:var(--purple); }
+.mm-icon-wrap {
+  width:44px;height:44px;border-radius:10px;background:var(--s3);
+  border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.mm-card.cur .mm-icon-wrap { background:var(--purple3);border-color:rgba(124,58,237,.3); }
+.mm-icon { width:22px;height:22px;stroke:var(--t2);stroke-width:1.5;fill:none; }
+.mm-card.cur .mm-icon { stroke:var(--purple); }
+.mm-info { flex:1;min-width:0; }
+.mm-name { font-family:var(--mono);font-size:12px;font-weight:700;color:var(--t1);margin-bottom:3px; }
+.mm-desc { font-size:11.5px;color:var(--t2);line-height:1.4; }
+.mm-meta { display:flex;align-items:center;gap:6px;margin-top:6px; }
+.mm-badge {
+  font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:4px;letter-spacing:.06em;
+  border:1px solid var(--b3);color:var(--t2);background:var(--s3);
+}
+.mm-badge.vision { border-color:rgba(124,58,237,.3);color:rgba(167,139,250,.9);background:rgba(124,58,237,.08); }
+.mm-badge.default { border-color:rgba(34,197,94,.3);color:rgba(34,197,94,.9);background:rgba(34,197,94,.06); }
+.mm-badge.unc { border-color:rgba(239,68,68,.3);color:rgba(239,68,68,.85);background:rgba(239,68,68,.06); }
+.mm-badge.size { font-size:9px; }
+.mm-actions { display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0; }
+.mm-btn {
+  padding:7px 14px;border:none;border-radius:6px;
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.mm-btn.select { background:var(--purple);color:#fff; }
+.mm-btn.select:hover { background:var(--purple2); }
+.mm-btn.active { background:var(--b2);color:var(--t3);cursor:default; }
+.mm-btn.pull { background:transparent;border:1px solid var(--b2);color:var(--t3); }
+.mm-btn.pull:hover { border-color:var(--purple);color:var(--purple); }
+.mm-status { display:flex;align-items:center;gap:5px;font-size:10px; }
+.mm-st-dot { width:5px;height:5px;border-radius:50%; }
+.mm-st-dot.installed { background:var(--green);box-shadow:0 0 4px var(--green); }
+.mm-st-dot.missing { background:var(--t3); }
+.mm-st-txt { font-family:var(--mono);font-size:9px;color:var(--t2); }
+/* ── Pull / Download scene overlay ── */
+#pull-scene {
+  position:fixed;inset:0;z-index:3000;display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(4,4,4,.96);backdrop-filter:blur(16px);
+}
+#pull-scene.on { display:flex;animation:fi .2s; }
+.ps-icon {
+  width:56px;height:56px;border-radius:16px;
+  background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+}
+.ps-title { font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--t1);margin-bottom:6px; }
+.ps-sub   { font-size:12px;color:var(--t3);margin-bottom:28px;text-align:center;max-width:340px;line-height:1.5; }
+.ps-bar-wrap { width:340px;height:5px;background:var(--b2);border-radius:3px;overflow:hidden;margin-bottom:10px; }
+.ps-bar { height:100%;background:linear-gradient(90deg,#7c3aed,#2563eb);border-radius:3px;transition:width .4s; }
+.ps-pct { font-family:var(--mono);font-size:24px;font-weight:700;color:var(--purple);margin-bottom:6px; }
+.ps-meta { font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.05em;margin-bottom:24px; }
+.ps-cancel { background:none;border:1px solid var(--b2);color:var(--t3);border-radius:8px;padding:8px 20px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.06em;transition:all .15s; }
+.ps-cancel:hover { border-color:var(--red);color:var(--red); }
+
+/* Badge additions */
+.mm-badge.custom { border-color:rgba(251,146,60,.35);color:rgba(251,146,60,.9);background:rgba(251,146,60,.06); }
+.mm-card.custom-add { border-style:dashed;justify-content:center;gap:8px;color:var(--t3);font-size:12px;font-family:var(--mono); }
+.mm-card.custom-add:hover { border-color:var(--purple);color:var(--purple); }
+.mm-card.custom-add svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round; }
+/* Llama download card in modal */
+.mm-llama-banner {
+  margin:8px 14px 0;padding:12px 16px;background:rgba(234,179,8,.04);
+  border:1px solid rgba(234,179,8,.2);border-radius:10px;
+  display:flex;align-items:center;gap:12px;
+}
+.mm-llama-banner.ok { background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2); }
+.mm-lb-ico { width:30px;height:30px;border-radius:8px;background:rgba(234,179,8,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.mm-llama-banner.ok .mm-lb-ico { background:rgba(34,197,94,.1); }
+.mm-lb-text { flex:1;min-width:0; }
+.mm-lb-title { font-size:11.5px;font-weight:600;color:var(--t1);margin-bottom:2px; }
+.mm-lb-sub { font-size:10.5px;color:var(--t3); }
+.mm-lb-btn { background:rgba(234,179,8,.15);border:1px solid rgba(234,179,8,.3);color:#fbbf24;border-radius:6px;padding:6px 12px;font-size:10px;font-family:var(--mono);font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap; }
+.mm-lb-btn:hover { background:rgba(234,179,8,.25); }
+.mm-llama-banner.ok .mm-lb-btn { display:none; }
+
+
+/* ── Body ── */
+#body { display:flex;flex:1;overflow:hidden;height:100%;position:relative; }
+#nav {
+  width:var(--nav-w);flex-shrink:0;background:var(--bg);border-right:1px solid var(--b1);
+  display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;
+  overflow:visible;position:relative;z-index:100;
+}
+.ni {
+  width:38px;height:38px;border:none;background:transparent;border-radius:var(--r);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--t3);transition:all .15s;position:relative;
+}
+.ni:hover { background:var(--s2);color:var(--t2); }
+.ni.on { background:var(--purple3);color:var(--purple); }
+.ni.on::after {
+  content:'';position:absolute;left:0;top:6px;bottom:6px;width:2px;
+  background:var(--purple);border-radius:0 2px 2px 0;box-shadow:0 0 8px var(--purple-g);
+}
+.ni svg { width:17px;height:17px;stroke-width:1.7; }
+.ni-tt {
+  position:fixed;left:calc(var(--nav-w) + 8px);background:var(--s2);border:1px solid var(--b2);
+  border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:10px;color:var(--t1);
+  white-space:nowrap;opacity:0;transition:opacity .15s;
+  pointer-events:none;z-index:9999;letter-spacing:.04em;
+  transform:none;box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+.ni:hover .ni-tt { opacity:1; }
+.n-div { width:24px;height:1px;background:var(--b1);margin:4px 0; }
+.n-sp { flex:1; }
+
+/* ── Panels ── */
+#panels { flex:1;overflow:hidden;display:flex;flex-direction:column;height:100%; }
+.panel { display:none;flex:1;flex-direction:column;overflow:hidden;height:100%; }
+.panel.on { display:flex; }
+
+/* Panel header (reusable) */
+.ph { padding:16px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;flex-shrink:0; }
+.ph-title { font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--t1); }
+.ph-sub { font-size:11px;color:var(--t3);margin-top:2px; }
+.ph-right { margin-left:auto; }
+.ph-btn {
+  padding:5px 10px;background:transparent;border:1px solid var(--b2);border-radius:var(--r);
+  color:var(--t3);font-size:10px;font-family:var(--mono);cursor:pointer;transition:all .15s;
+}
+.ph-btn:hover { border-color:var(--red);color:var(--red); }
+
+/* ══ CHAT ══ */
+/* Mode badges */
+.mode-badge {
+  display:inline-flex;align-items:center;gap:5px;cursor:pointer;
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.08em;
+  padding:4px 10px;border-radius:20px;transition:all .15s;user-select:none;
+  background:var(--s2);border:1px solid var(--b2);color:var(--t3);
+}
+.mode-badge:hover { border-color:var(--b3);color:var(--t2); }
+.mode-badge.active { background:rgba(124,58,237,.1);border-color:rgba(124,58,237,.3);color:#a78bfa; }
+.mode-badge svg { flex-shrink:0; }
+
+/* Tune tiles */
+.tune-tile{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:8px 10px}
+.tune-k{font-size:8.5px;font-family:var(--mono);letter-spacing:.1em;color:var(--t3);margin-bottom:3px}
+.tune-v{font-size:13px;font-weight:700;font-family:var(--mono);color:var(--purple)}
+/* Hardware badges in settings */
+.hw-badge{font-family:var(--mono);font-size:10px;padding:4px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:6px;color:var(--t2);white-space:nowrap}
+.hw-badge.hw-badge-acc{background:var(--purple3);border-color:rgba(124,58,237,.25);color:var(--purple)}
+/* Hotkey badge */
+.hk-badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:5px 12px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;color:var(--t2);cursor:pointer;transition:all .15s;user-select:none;white-space:nowrap}
+.hk-badge:hover{border-color:var(--purple);color:var(--purple)}
+.hk-badge.recording{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.06)}
+/* API provider cards */
+.api-provider-card{border:1.5px solid var(--b2);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .15s;background:var(--s1)}
+.api-provider-card:hover{border-color:var(--b3);background:var(--s2)}
+.api-provider-card.selected{border-color:var(--purple);background:rgba(124,58,237,.07)}
+/* Streaming bubble cursor blink */
+.mr.streaming .bub::after{content:'▋';display:inline;color:var(--purple);animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* OC warning modal */
+#oc-modal{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+#oc-modal.show{display:flex}
+.oc-box{width:340px;background:#0c0b14;border:1px solid rgba(251,191,36,.25);border-radius:14px;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.8);animation:popIn .2s cubic-bezier(.2,.8,.3,1);}
+@keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.oc-warn-icon{width:44px;height:44px;border-radius:12px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.oc-title{font-size:15px;font-weight:700;color:#fbbf24;margin-bottom:6px}
+.oc-desc{font-size:12px;color:var(--t2);line-height:1.65;margin-bottom:18px}
+.oc-desc strong{color:var(--t1)}
+.oc-btns{display:flex;gap:8px}
+.oc-cancel{flex:1;background:var(--s2);border:1px solid var(--b2);color:var(--t2);font-size:12px;font-weight:600;padding:9px;border-radius:8px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.oc-cancel:hover{border-color:var(--b3);color:var(--t1)}
+.oc-confirm{flex:1;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:#fbbf24;font-size:12px;font-weight:700;padding:9px;border-radius:8px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.oc-confirm:hover{background:rgba(251,191,36,.22)}
+
+/* Drag-drop overlay */
+#dd-overlay{display:none;position:fixed;inset:0;z-index:8000;background:rgba(7,5,15,.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;pointer-events:none;}
+#dd-overlay.show{display:flex;pointer-events:all}
+.dd-inner{border:2px dashed rgba(124,92,252,.45);border-radius:20px;width:320px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(124,92,252,.05);animation:ddPulse 1.6s ease-in-out infinite;}
+@keyframes ddPulse{0%,100%{border-color:rgba(124,92,252,.35)}50%{border-color:rgba(124,92,252,.75)}}
+.dd-lbl{font-size:14px;font-weight:600;color:var(--t1)}
+.dd-sub{font-size:11px;color:var(--t3)}
+
+/* Copy button on messages */
+.bub-wrap { position:relative; }
+.copy-btn {
+  position:absolute;top:6px;right:6px;width:22px;height:22px;
+  background:var(--s3);border:1px solid var(--b2);border-radius:5px;
+  color:var(--t3);cursor:pointer;display:none;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.copy-btn:hover { background:var(--b2);color:var(--t1); }
+.copy-btn.copied { color:var(--green); }
+
+/* Click ripple */
+@keyframes ripple { from{transform:scale(0);opacity:.4} to{transform:scale(2.5);opacity:0} }
+.ripple-host { position:relative;overflow:hidden; }
+.ripple { position:absolute;border-radius:50%;background:rgba(124,58,237,.3);pointer-events:none;animation:ripple .4s ease-out forwards; }
+
+
+
+#welcome {
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 32px;gap:20px;text-align:center;
+}
+.wlc-spark { animation:sparkPulse 3s ease-in-out infinite; }
+@keyframes sparkPulse{0%,100%{filter:drop-shadow(0 0 20px var(--purple-g))}50%{filter:drop-shadow(0 0 38px rgba(124,58,237,.55))}}
+.wlc-name { font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:.06em;color:var(--t1); }
+.wlc-sub { font-size:13px;color:var(--t2);max-width:380px;line-height:1.7; }
+.chips { display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:520px;margin-top:4px; }
+.chip {
+  padding:7px 14px;background:transparent;border:1px solid var(--b3);border-radius:6px;
+  font-family:var(--mono);font-size:11px;color:var(--t2);cursor:pointer;
+  transition:all .15s;white-space:nowrap;user-select:none;
+}
+.chip:hover { border-color:var(--purple);color:var(--t1);background:var(--purple4); }
+
+#msgs { flex:1;overflow-y:auto;padding:20px 24px 8px;display:flex;flex-direction:column;gap:4px;scroll-behavior:smooth; }
+#msgs::-webkit-scrollbar { width:3px; }
+#msgs::-webkit-scrollbar-thumb { background:var(--b2);border-radius:2px; }
+.mr { display:flex;gap:10px;align-items:flex-start;animation:mIn .18s ease-out; }
+@keyframes mIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.mr.jane { align-self:flex-start;max-width:84%; }
+.mr.user { align-self:flex-end;max-width:72%;flex-direction:row-reverse; }
+.mr.err .bub { background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2);color:var(--red); }
+.av { width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:3px; }
+.av.jane { background:var(--s2);border:1px solid var(--b2);color:var(--purple); }
+.av.user { background:var(--s1);border:1px solid var(--b1);color:var(--t3); }
+.av svg { width:14px;height:14px; }
+.bub { padding:9px 13px;border-radius:var(--r2);font-size:13.5px;line-height:1.7;word-wrap:break-word; }
+.mr.jane .bub { background:var(--s1);border:1px solid var(--b1);color:var(--t1);border-top-left-radius:3px; }
+.mr.user .bub { background:var(--s2);border:1px solid var(--b2);color:var(--t1);border-top-right-radius:3px; }
+.bub code { font-family:var(--mono);font-size:11.5px;background:rgba(124,58,237,.08);padding:1px 5px;border-radius:4px;color:#a78bfa; }
+.bub pre { background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:10px 12px;overflow-x:auto;margin:8px 0;font-family:var(--mono);font-size:11.5px;color:var(--t1);line-height:1.5; }
+.bub pre code { background:none;padding:0;color:inherit; }
+.bub strong { color:var(--t1);font-weight:600; }
+.mts { font-size:10px;color:var(--t3);padding-top:6px;flex-shrink:0; }
+
+/* Tool cards */
+.tc { background:var(--s1);border:1px solid var(--b1);border-left:2px solid var(--amber);border-radius:var(--r);overflow:hidden;animation:mIn .16s ease-out;align-self:flex-start;max-width:88%;margin:2px 0; }
+.tc.ok { border-left-color:var(--green); }
+.tc.fail { border-left-color:var(--red); }
+.tc-h { display:flex;align-items:center;gap:8px;padding:7px 11px;cursor:pointer;transition:background .1s; }
+.tc-h:hover { background:var(--s2); }
+.tc-ico { width:14px;height:14px;flex-shrink:0; }
+.tc-name { font-family:var(--mono);font-size:11px;color:var(--amber);font-weight:700;flex:1; }
+.tc.ok .tc-name { color:var(--green); }
+.tc.fail .tc-name { color:var(--red); }
+.tc-st { font-size:10px;color:var(--t3);display:flex;align-items:center;gap:5px; }
+.tc-ch { font-size:8px;color:var(--t3);transition:transform .18s; }
+.tc.open .tc-ch { transform:rotate(180deg); }
+.spn { width:9px;height:9px;border:1.5px solid var(--b3);border-top-color:var(--amber);border-radius:50%;animation:spin .6s linear infinite; }
+@keyframes spin{to{transform:rotate(360deg)}}
+.tc-b { display:none;border-top:1px solid var(--b1); }
+.tc.open .tc-b { display:block; }
+.tc-s { padding:7px 11px; }
+.tc-s+.tc-s { border-top:1px solid var(--b1); }
+.tc-lbl { font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);font-family:var(--mono);font-weight:700;margin-bottom:4px; }
+.tc-pre { font-family:var(--mono);font-size:10.5px;color:var(--t2);white-space:pre-wrap;word-break:break-all;max-height:160px;overflow-y:auto;line-height:1.5; }
+/* Thinking */
+.thk { display:flex;align-items:center;gap:10px;align-self:flex-start;animation:mIn .15s ease-out; }
+.thk-dots { display:flex;gap:4px;align-items:center;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);border-top-left-radius:3px;padding:8px 13px; }
+.thk-dots span { width:4px;height:4px;border-radius:50%;background:var(--purple);animation:tb 1.2s infinite; }
+.thk-dots span:nth-child(2){animation-delay:.15s}.thk-dots span:nth-child(3){animation-delay:.30s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-4px);opacity:1}}
+.thk-lbl { font-size:10.5px;color:var(--t3);font-family:var(--mono);font-style:italic; }
+
+/* Input area */
+#input-z { padding:10px 18px 14px;border-top:1px solid var(--b1);background:var(--bg);flex-shrink:0; }
+.ibar {
+  display:flex;align-items:flex-end;gap:6px;background:var(--s1);border:1px solid var(--b1);
+  border-radius:var(--r2);padding:6px 6px 6px 14px;transition:border-color .15s,box-shadow .15s;
+}
+.ibar:focus-within { border-color:rgba(124,58,237,.3);box-shadow:0 0 0 3px rgba(124,58,237,.05); }
+#msg-in {
+  flex:1;background:none;border:none;outline:none;color:var(--t1);font-size:13.5px;
+  line-height:1.55;resize:none;max-height:90px;min-height:28px;
+  padding:5px 0;scrollbar-width:none;user-select:text;font-family:var(--sans);
+}
+#msg-in::placeholder { color:var(--t3); }
+#msg-in::-webkit-scrollbar { display:none; }
+.ib { width:30px;height:30px;border:none;background:transparent;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);transition:all .15s;flex-shrink:0; }
+.ib:hover { background:var(--s3);color:var(--t2); }
+.ib.on { color:var(--purple);background:var(--purple3); }
+.ib.listening { color:var(--red);background:rgba(239,68,68,.08);animation:lp 1s infinite; }
+@keyframes lp{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 5px rgba(239,68,68,0)}}
+.ib svg { width:15px;height:15px; }
+#send-btn { width:30px;height:30px;border:none;background:var(--purple);border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:all .15s;flex-shrink:0; }
+#send-btn:hover:not(:disabled) { background:var(--purple2);transform:scale(1.05); }
+#send-btn:disabled { background:var(--b2);color:var(--t3);cursor:not-allowed;transform:none; }
+#send-btn svg { width:14px;height:14px; }
+
+/* ══ HISTORY PANEL ══ */
+.hist-search { padding:10px 20px;border-bottom:1px solid var(--b1);flex-shrink:0; }
+.hs-in { width:100%;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:8px 12px;color:var(--t1);font-size:12px;outline:none;font-family:var(--sans);transition:border-color .15s;user-select:text; }
+.hs-in:focus { border-color:rgba(124,58,237,.3); }
+.hs-in::placeholder { color:var(--t3); }
+.hist-list { flex:1;overflow-y:auto;padding:8px 12px;display:flex;flex-direction:column;gap:4px; }
+.hist-list::-webkit-scrollbar { width:3px; }
+.hist-list::-webkit-scrollbar-thumb { background:var(--b1); }
+.hist-empty { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--t3);text-align:center;padding:40px; }
+.hist-empty svg { width:32px;height:32px;opacity:.4; }
+.hist-empty-t { font-family:var(--mono);font-size:11px;letter-spacing:.06em; }
+.hist-empty-s { font-size:11px;color:var(--t3);max-width:200px;line-height:1.6; }
+/* History item */
+.hi { display:flex;align-items:flex-start;gap:10px;padding:11px 12px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);cursor:pointer;transition:all .15s;animation:mIn .15s ease-out; }
+.hi:hover { border-color:var(--b3);background:var(--s2); }
+.hi.active { border-color:rgba(124,58,237,.3);background:var(--purple4); }
+.hi-icon { width:30px;height:30px;border-radius:var(--r);background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px; }
+.hi-icon svg { width:13px;height:13px;stroke:var(--t3);stroke-width:1.5; }
+.hi.active .hi-icon { background:var(--purple3);border-color:rgba(124,58,237,.3); }
+.hi.active .hi-icon svg { stroke:var(--purple); }
+.hi-body { flex:1;min-width:0; }
+.hi-title { font-size:12.5px;color:var(--t1);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px; }
+.hi-preview { font-size:11px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.hi-meta { display:flex;align-items:center;justify-content:space-between;margin-top:4px; }
+.hi-time { font-family:var(--mono);font-size:9.5px;color:var(--t3); }
+.hi-count { font-family:var(--mono);font-size:9px;color:var(--t3);background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:1px 5px; }
+.hi-del { width:22px;height:22px;border:none;background:transparent;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);flex-shrink:0;transition:all .12s; }
+.hi-del:hover { background:rgba(239,68,68,.1);color:var(--red); }
+.hi-del svg { width:10px;height:10px; }
+.h-date-group { font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:8px 4px 4px; }
+
+/* ══ VOICE SESSION PANEL ══ */
+#p-voice { flex-direction:column; }
+.vs-body { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:40px; }
+#vs-orb {
+  width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle at center, rgba(124,58,237,.4) 0%, rgba(124,58,237,.1) 60%, transparent 100%);
+  border:1px solid rgba(124,58,237,.3);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;cursor:pointer;transition:all .3s;
+}
+#vs-orb:hover { border-color:rgba(124,58,237,.6); }
+#vs-orb.active {
+  background:radial-gradient(circle at center, rgba(124,58,237,.7) 0%, rgba(124,58,237,.3) 60%, transparent 100%);
+  border-color:rgba(124,58,237,.8);
+  animation:orbPulse 1.5s ease-in-out infinite;
+}
+@keyframes orbPulse{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,.4)}50%{box-shadow:0 0 0 20px rgba(124,58,237,0)}}
+#vs-orb svg { width:36px;height:36px;stroke:rgba(124,58,237,.9);stroke-width:1.5; }
+#vs-orb.active svg { stroke:#c4b5fd; }
+#vs-status { font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--t3);text-align:center; }
+#vs-transcript {
+  width:100%;max-width:480px;background:var(--s1);border:1px solid var(--b1);
+  border-radius:var(--r2);padding:14px 16px;font-size:13px;color:var(--t2);
+  min-height:80px;text-align:center;line-height:1.7;font-style:italic;
+}
+.vs-hint { font-size:11px;color:var(--t4);text-align:center;max-width:300px;line-height:1.7; }
+#vs-toggle {
+  padding:11px 28px;background:var(--purple);border:none;border-radius:10px;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;
+  color:#fff;cursor:pointer;transition:all .15s;
+}
+#vs-toggle:hover { background:var(--purple2); }
+#vs-toggle.active { background:rgba(239,68,68,.8); }
+
+/* ══ APPS PANEL ══ */
+.apps-inner { flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px; }
+.as-title { font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:8px; }
+.abar { display:flex;gap:8px; }
+.a-in { flex:1;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;color:var(--t1);font-size:13px;outline:none;font-family:var(--sans);transition:border-color .15s;user-select:text; }
+.a-in:focus { border-color:rgba(124,58,237,.3); }
+.a-in::placeholder { color:var(--t3); }
+.a-go { padding:9px 16px;background:var(--purple);border:none;border-radius:var(--r);color:#fff;font-size:11.5px;font-family:var(--mono);font-weight:700;letter-spacing:.04em;cursor:pointer;transition:background .15s; }
+.a-go:hover { background:var(--purple2); }
+.apps-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px; }
+.atile { background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all .15s;text-align:center; }
+.atile:hover { border-color:var(--purple);background:var(--purple4);transform:translateY(-2px); }
+.atile svg { width:24px;height:24px; }
+.atile-n { font-family:var(--mono);font-size:10px;color:var(--t3); }
+
+/* ══ SETTINGS PANEL ══ */
+#p-settings { height:100%;overflow:hidden; }
+.sett-inner { flex:1;min-height:0;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:22px;align-items:stretch;max-width:900px;margin:0 auto; }
+.sett-inner::-webkit-scrollbar { width:8px; }
+.sett-inner::-webkit-scrollbar-thumb { background:linear-gradient(180deg,rgba(124,58,237,.6),rgba(124,58,237,.3));border-radius:8px; }
+.sc { flex:0 0 auto;width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--r2);display:flex;flex-direction:column;overflow:hidden;transition:border-color .2s,box-shadow .2s; }
+.sc:hover { border-color:rgba(124,58,237,.25); }
+.sc-h { padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--t2);display:flex;align-items:center;gap:10px; }
+.sc-h svg { width:14px;height:14px;opacity:.8; }
+.sr { display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.05); }
+.sr:last-child { border-bottom:none; }
+.sr-i { flex:1;min-width:0; }
+.sr-l { font-size:13px;font-weight:500;color:#e8e8f0;margin-bottom:2px; }
+.sr-s { font-size:11px;color:rgba(255,255,255,.4);line-height:1.5; }
+.tog { width:36px;height:20px;background:var(--s3);border:1.5px solid var(--b2);border-radius:12px;position:relative;cursor:pointer;transition:background .2s,border-color .2s;flex-shrink:0; }
+.tog.on { background:var(--purple);border-color:var(--purple); }
+.tog::after { content:'';position:absolute;width:12px;height:12px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.4); }
+.tog.on::after { transform:translateX(16px); }
+#ovl-btn { width:36px;height:20px;background:var(--s3);border:1.5px solid var(--b2);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0; }
+#ovl-btn.on { background:var(--purple);border-color:var(--purple); }
+#ovl-btn::after { content:'';position:absolute;width:12px;height:12px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .18s; }
+#ovl-btn.on::after { transform:translateX(16px); }
+.v-sel { background:var(--s2);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:7px 12px;min-width:180px;color:var(--t2);font-family:var(--mono);font-size:11px;outline:none;transition:border-color .2s; }
+.v-sel:focus { border-color:rgba(124,58,237,.4); }
+.lic-r { display:flex;padding:14px 18px;gap:14px;border-bottom:1px solid rgba(255,255,255,.06);align-items:flex-start; }
+.lic-r:last-child { border-bottom:none; }
+.lic-k { font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.45);min-width:110px;text-transform:uppercase;letter-spacing:.08em; }
+.lic-v { font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.85);line-height:1.5; }
+
+/* Status bar */
+#sb { height:20px;border-top:1px solid var(--b1);background:var(--bg);display:flex;align-items:center;padding:0 14px;gap:8px;font-size:10.5px;color:var(--t3);font-family:var(--mono);flex-shrink:0;letter-spacing:.04em; }
+.sb-dot { width:5px;height:5px;border-radius:50%;background:var(--t3);flex-shrink:0; }
+.sb-dot.on { background:var(--green);box-shadow:0 0 5px var(--green); }
+.sb-dot.pulse { animation:sp 1.5s infinite; }
+@keyframes sp{0%,100%{opacity:1}50%{opacity:.2}}
+#sb-txt { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+
+/* Approval overlay */
+#aov { position:fixed;inset:0;background:rgba(8,8,8,.88);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:1000; }
+#aov.show { display:flex;animation:fi .15s; }
+.ab { background:var(--s2);border:1px solid var(--b2);border-radius:16px;padding:28px;width:450px;max-width:92vw;animation:su .18s ease-out;box-shadow:0 32px 80px rgba(0,0,0,.8); }
+.ab-ico { margin-bottom:12px; }
+.ab-ico svg { width:26px;height:26px;stroke:var(--amber); }
+.ab-t { font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.04em;color:var(--t1);margin-bottom:6px; }
+.ab-s { font-size:12.5px;color:var(--t3);margin-bottom:16px;line-height:1.6; }
+.ab-d { background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:16px; }
+.ab-r { display:flex;gap:10px;padding:7px 12px;border-bottom:1px solid var(--b1);font-size:12px; }
+.ab-r:last-child { border-bottom:none; }
+.ab-k { color:var(--t3);min-width:60px;font-size:9.5px;text-transform:uppercase;letter-spacing:.07em;font-family:var(--mono);padding-top:2px; }
+.ab-v { font-family:var(--mono);font-size:11px;color:var(--t1);word-break:break-all; }
+.ab-btns { display:flex;gap:10px; }
+.ab-btn { flex:1;padding:10px;border:none;border-radius:var(--r);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:all .15s; }
+.ab-btn.ok { background:var(--purple);color:#fff; }
+.ab-btn.ok:hover { background:var(--purple2); }
+.ab-btn.no { background:var(--s1);border:1px solid var(--b2);color:var(--t3); }
+.ab-btn.no:hover { border-color:var(--red);color:var(--red);background:rgba(239,68,68,.06); }
+/* ══ PERSONALIZATION PANEL ══ */
+#p-persona .sett-inner { padding:24px 28px; }
+.pf-row { display:flex;flex-direction:column;gap:6px;margin-bottom:18px; }
+.pf-lbl { font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3); }
+.pf-in {
+  background:var(--s1);border:1px solid var(--b2);border-radius:var(--r);
+  padding:9px 12px;color:var(--t1);font-size:13px;outline:none;
+  font-family:var(--sans);transition:border-color .15s;user-select:text;width:100%;
+}
+.pf-in:focus { border-color:rgba(var(--purple-rgb,.124,58,237),.4); border-color:var(--purple); }
+.pf-in::placeholder { color:var(--t4); }
+.pf-ta { resize:vertical;min-height:80px;max-height:200px; }
+.tone-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:8px; }
+.tone-btn {
+  padding:8px 4px;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r);
+  font-family:var(--mono);font-size:10px;color:var(--t3);cursor:pointer;
+  transition:all .15s;text-align:center;
+}
+.tone-btn:hover { border-color:var(--purple);color:var(--t1); }
+.tone-btn.on { background:var(--purple3);border-color:var(--purple);color:var(--purple); }
+
+/* Theme picker */
+.theme-row { display:flex;gap:10px;flex-wrap:wrap; }
+.theme-swatch {
+  width:52px;height:52px;border-radius:10px;border:2px solid var(--b2);
+  cursor:pointer;transition:all .18s;display:flex;align-items:flex-end;
+  justify-content:center;padding-bottom:6px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.04em;color:rgba(255,255,255,.7);position:relative;overflow:hidden;
+}
+.theme-swatch::before { content:'';position:absolute;inset:0;border-radius:8px; }
+.theme-swatch.t-original::before { background:linear-gradient(135deg,#080808 50%,#7c3aed 100%); }
+.theme-swatch.t-white::before    { background:linear-gradient(135deg,#f8f8f8 50%,#7c3aed 100%); }
+.theme-swatch.t-custom::before   { background:linear-gradient(135deg,#080808 50%, var(--custom-accent,#7c3aed) 100%); }
+.theme-swatch.on { border-color:var(--purple);box-shadow:0 0 0 3px var(--purple3); }
+.theme-swatch span { position:relative;z-index:1; }
+.theme-swatch.t-white span { color:rgba(0,0,0,.6); }
+.accent-row { display:flex;align-items:center;gap:10px;margin-top:12px; }
+.accent-lbl { font-family:var(--mono);font-size:10px;color:var(--t3); }
+#accent-picker { width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:0;background:none; }
+#accent-hex { width:90px; }
+.pf-save {
+  padding:10px 24px;background:var(--purple);border:none;border-radius:var(--r);
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;
+  color:#fff;cursor:pointer;transition:all .15s;margin-top:8px;
+}
+.pf-save:hover { background:var(--purple2); }
+
+/* Auto-switch toast */
+#auto-switch-toast {
+  position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--s2);border:1px solid var(--b3);border-radius:10px;
+  padding:10px 18px;display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:11px;color:var(--t2);
+  opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:500;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);white-space:nowrap;
+}
+#auto-switch-toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+#auto-switch-toast svg { width:14px;height:14px;flex-shrink:0; }
+
+/* Download progress bar enhancement */
+.mm-pull-pct { font-family:var(--mono);font-size:10px;color:var(--purple);margin-left:auto; }
+.mm-pull-inner { height:100%;background:var(--purple);border-radius:2px;transition:width .3s; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TITLEBAR -->
+<div id="tb">
+  <div class="tb-brand">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
+      style="width:22px;height:22px;fill:#6d41be;filter:drop-shadow(0 0 8px rgba(109,65,190,.5))">
+      <path d="M4 6h10v4h-4v4h4v4h-4v4h4v4h-10v-20zM22 6v4h-4v4h4v4h-4v4h4v4h6v-20h-6z"/>
+    </svg>
+    JANE
+  </div>
+
+  <div id="tb-wave">
+    <div class="b"></div><div class="b"></div><div class="b"></div>
+    <div class="b"></div><div class="b"></div><div class="b"></div>
+    <div class="b"></div><div class="b"></div><div class="b"></div>
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <!-- Model pill → opens modal -->
+  <div id="m-pill" onclick="openMM()">
+    <div class="m-dot"></div>
+    <span id="m-name">llama3.2:3b</span>
+    <svg class="m-pill-icon" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="width:10px;height:6px"><path d="M1 1l4 4 4-4"/></svg>
+  </div>
+
+  <div class="wbtns">
+    <button class="wbtn" onclick="window.jane.minimize()">
+      <svg viewBox="0 0 12 2" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="1" y1="1" x2="11" y2="1"/></svg>
+    </button>
+    <button class="wbtn" onclick="window.jane.maximize()">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="10" height="10" rx="1"/></svg>
+    </button>
+    <button class="wbtn x" onclick="window.jane.close()">
+      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- MODEL SELECTION MODAL -->
+<!-- PULL / DOWNLOAD SCENE -->
+<div id="pull-scene">
+  <div class="ps-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+    </svg>
+  </div>
+  <div class="ps-pct" id="ps-pct">0%</div>
+  <div class="ps-title" id="ps-title">PULLING MODEL</div>
+  <div class="ps-sub" id="ps-sub">Downloading… please wait</div>
+  <div class="ps-bar-wrap"><div class="ps-bar" id="ps-bar" style="width:0%"></div></div>
+  <div class="ps-meta" id="ps-meta">—</div>
+  <button class="ps-cancel" id="ps-cancel" onclick="cancelPull()">CANCEL</button>
+</div>
+
+<div id="model-modal">
+  <div style="position:absolute;inset:0" onclick="closeMM()"></div>
+  <div class="mm-panel">
+    <div class="mm-hdr">
+      <svg class="mm-hdr-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 6h10v4h-4v4h4v4h-4v4h4v4h-10v-20zM22 6v4h-4v4h4v4h-4v4h4v4h6v-20h-6z"/>
+      </svg>
+      <div>
+        <div class="mm-hdr-title">SELECT MODEL</div>
+        <div class="mm-hdr-sub">All models run 100% locally · Powered by Llama</div>
+      </div>
+      <button class="mm-close" onclick="closeMM()">
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M1 1l8 8M9 1l-8 8"/>
+        </svg>
+      </button>
+    </div>
+    <!-- llama-server status banner -->
+    <div id="mm-llama-banner" class="mm-llama-banner">
+      <div class="mm-lb-ico">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="mm-lb-text">
+        <div class="mm-lb-title" id="mm-lb-title">llama-server not found</div>
+        <div class="mm-lb-sub" id="mm-lb-sub">Auto-download the correct build for your GPU</div>
+      </div>
+      <button class="mm-lb-btn" id="mm-lb-btn" onclick="downloadLlama()">AUTO-DOWNLOAD</button>
+    </div>
+    <div class="mm-cards" id="mm-cards"><!-- populated by JS --></div>
+  </div>
+</div>
+
+
+
+<!-- BODY -->
+<div id="body">
+
+  <!-- NAV RAIL -->
+  <nav id="nav">
+    <button class="ni on" data-p="p-chat" onclick="sw('p-chat',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13a2 2 0 01-2 2H6l-4 3V5a2 2 0 012-2h12a2 2 0 012 2z"/>
+      </svg>
+      <span class="ni-tt">Chat</span>
+    </button>
+
+    <button class="ni" data-p="p-history" onclick="sw('p-history',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="10" cy="10" r="8"/><path d="M10 6v4l3 3"/>
+      </svg>
+      <span class="ni-tt">History</span>
+    </button>
+
+    <button class="ni" data-p="p-apps" onclick="sw('p-apps',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="5" height="5" rx="1"/>
+        <rect x="12" y="3" width="5" height="5" rx="1"/>
+        <rect x="3" y="12" width="5" height="5" rx="1"/>
+        <rect x="12" y="12" width="5" height="5" rx="1"/>
+      </svg>
+      <span class="ni-tt">Apps</span>
+    </button>
+
+    <div class="n-div"></div>
+
+    <button class="ni" data-p="p-settings" onclick="sw('p-settings',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="10" cy="10" r="3"/>
+        <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/>
+      </svg>
+      <span class="ni-tt">Settings</span>
+    </button>
+
+    <button class="ni" data-p="p-persona" onclick="sw('p-persona',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8" cy="7" r="3.5"/><path d="M1 18a7 7 0 0114 0"/>
+        <path d="M15 5l3 3m0-3l-3 3" stroke-width="1.5"/>
+      </svg>
+      <span class="ni-tt">Personalize</span>
+    </button>
+
+    <button class="ni" data-p="p-automation" onclick="sw('p-automation',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/>
+        <rect x="3" y="11" width="6" height="6" rx="1"/>
+        <path d="M14 11v6M11 14h6"/>
+      </svg>
+      <span class="ni-tt">Automation</span>
+    </button>
+
+    <div class="n-sp"></div>
+
+    <!-- Voice Session button -->
+    <button class="ni" data-p="p-voice" id="vs-nav" onclick="sw('p-voice',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="7" y="2" width="6" height="11" rx="3"/>
+        <path d="M3 10a7 7 0 0014 0M10 17v3"/>
+      </svg>
+      <span class="ni-tt">Voice Session</span>
+    </button>
+  </nav>
+
+  <!-- PANELS -->
+  <!-- API Setup Modal -->
+  <div id="api-modal" style="display:none;position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+    <div style="width:380px;background:#0c0b14;border:1px solid var(--b2);border-radius:14px;padding:26px;box-shadow:0 24px 60px rgba(0,0,0,.8);animation:popIn .2s cubic-bezier(.2,.8,.3,1)">
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--t1);margin-bottom:4px" id="api-modal-title">CONFIGURE API</div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:18px">Connect to a cloud AI provider</div>
+
+      <!-- Provider picker -->
+      <div id="api-step-1">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:10px;font-family:var(--mono);letter-spacing:.06em">SELECT PROVIDER</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="api-provider-card" onclick="selectApiProvider('openai')" data-provider="openai">
+            <div style="font-size:13px;font-weight:700">OpenAI</div>
+            <div style="font-size:11px;color:var(--t3)">GPT-4o, GPT-4 Turbo, GPT-3.5</div>
+          </div>
+          <div class="api-provider-card" onclick="selectApiProvider('gemini')" data-provider="gemini">
+            <div style="font-size:13px;font-weight:700">Google Gemini</div>
+            <div style="font-size:11px;color:var(--t3)">Gemini 1.5 Pro, Gemini 1.5 Flash</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key input -->
+      <div id="api-step-2" style="display:none">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:10px;font-family:var(--mono);letter-spacing:.06em" id="api-provider-lbl">API KEY</div>
+        <input id="api-key-input" type="password" placeholder="sk-..." style="width:100%;background:var(--s2);border:1.5px solid var(--b2);border-radius:8px;padding:10px 13px;color:var(--t1);font-size:13px;font-family:var(--mono);outline:none;margin-bottom:10px;-webkit-user-select:text;user-select:text" oninput="this.style.borderColor='rgba(124,58,237,.4)'">
+        <div style="font-size:11px;color:var(--t3);margin-bottom:6px;font-family:var(--mono);letter-spacing:.06em">MODEL</div>
+        <select id="api-model-sel" class="v-sel" style="width:100%;margin-bottom:12px">
+          <option value="gpt-4o-mini">GPT-4o mini — fast, cheap</option>
+          <option value="gpt-4o">GPT-4o — smartest, costs more</option>
+          <option value="gpt-4-turbo">GPT-4 Turbo</option>
+          <option value="gpt-3.5-turbo">GPT-3.5 Turbo — cheapest</option>
+        </select>
+        <div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--t3);line-height:1.65;margin-bottom:16px">
+          ⚠️ <strong style="color:#fbbf24">Privacy Disclaimer:</strong> Using external APIs sends your messages to third-party servers. Visrodeck Technology Pvt. Ltd. is <strong style="color:var(--t2)">not responsible</strong> for any data, privacy breaches, or content arising from use of cloud API providers.
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:16px">
+          <input type="checkbox" id="api-agree-cb" style="accent-color:var(--purple);width:14px;height:14px">
+          <span style="font-size:11px;color:var(--t2)">I understand and accept the privacy disclaimer</span>
+        </label>
+        <div style="display:flex;gap:8px">
+          <button onclick="document.getElementById('api-step-2').style.display='none';document.getElementById('api-step-1').style.display='block'" style="flex:1;background:var(--s2);border:1px solid var(--b2);color:var(--t2);font-size:12px;font-weight:600;padding:9px;border-radius:8px;cursor:pointer;font-family:var(--sans)">← Back</button>
+          <button onclick="confirmApiKey()" style="flex:2;background:var(--purple);border:none;color:#fff;font-size:12px;font-weight:700;padding:9px;border-radius:8px;cursor:pointer;font-family:var(--sans)">Save Key & Enable →</button>
+        </div>
+      </div>
+      <button onclick="closeApiModal()" style="position:absolute;top:14px;right:14px;width:26px;height:26px;border:none;background:var(--s2);border-radius:6px;color:var(--t3);cursor:pointer;font-size:12px">✕</button>
+    </div>
+  </div>
+
+  <!-- Add Device Modal -->
+  <div id="device-modal" style="display:none;position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+    <div style="width:360px;background:#0c0b14;border:1px solid var(--b2);border-radius:14px;padding:24px;box-shadow:0 24px 60px rgba(0,0,0,.8);animation:popIn .2s cubic-bezier(.2,.8,.3,1);position:relative">
+      <div style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--t1);margin-bottom:16px">ADD DEVICE</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        <div><div style="font-size:10px;font-family:var(--mono);letter-spacing:.08em;color:var(--t3);margin-bottom:5px">DEVICE NAME</div>
+          <input id="dev-name" type="text" placeholder="Living Room Light" style="width:100%;background:var(--s2);border:1.5px solid var(--b2);border-radius:8px;padding:9px 12px;color:var(--t1);font-size:13px;font-family:var(--sans);outline:none;-webkit-user-select:text;user-select:text" oninput="this.style.borderColor='rgba(124,58,237,.4)'"></div>
+        <div><div style="font-size:10px;font-family:var(--mono);letter-spacing:.08em;color:var(--t3);margin-bottom:5px">TYPE</div>
+          <select id="dev-type" class="v-sel" style="width:100%">
+            <option value="http">HTTP Relay (smart plug, Tasmota, Shelly)</option>
+            <option value="mqtt">MQTT Broker</option>
+            <option value="rpi">Raspberry Pi (pigpio REST)</option>
+            <option value="arduino">Arduino (serial — coming soon)</option>
+          </select></div>
+        <div><div style="font-size:10px;font-family:var(--mono);letter-spacing:.08em;color:var(--t3);margin-bottom:5px">IP / HOST</div>
+          <input id="dev-host" type="text" placeholder="192.168.1.100" style="width:100%;background:var(--s2);border:1.5px solid var(--b2);border-radius:8px;padding:9px 12px;color:var(--t1);font-size:13px;font-family:var(--mono);outline:none;-webkit-user-select:text;user-select:text" oninput="this.style.borderColor='rgba(124,58,237,.4)'"></div>
+        <div><div style="font-size:10px;font-family:var(--mono);letter-spacing:.08em;color:var(--t3);margin-bottom:5px">ON COMMAND (URL path or MQTT topic)</div>
+          <input id="dev-on" type="text" placeholder="/cm?cmnd=Power%20On" style="width:100%;background:var(--s2);border:1.5px solid var(--b2);border-radius:8px;padding:9px 12px;color:var(--t1);font-size:13px;font-family:var(--mono);outline:none;-webkit-user-select:text;user-select:text"></div>
+        <div><div style="font-size:10px;font-family:var(--mono);letter-spacing:.08em;color:var(--t3);margin-bottom:5px">OFF COMMAND</div>
+          <input id="dev-off" type="text" placeholder="/cm?cmnd=Power%20Off" style="width:100%;background:var(--s2);border:1.5px solid var(--b2);border-radius:8px;padding:9px 12px;color:var(--t1);font-size:13px;font-family:var(--mono);outline:none;-webkit-user-select:text;user-select:text"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="document.getElementById('device-modal').style.display='none'" style="flex:1;background:var(--s2);border:1px solid var(--b2);color:var(--t2);font-size:12px;font-weight:600;padding:9px;border-radius:8px;cursor:pointer">Cancel</button>
+        <button onclick="saveDevice()" style="flex:2;background:var(--purple);border:none;color:#fff;font-size:12px;font-weight:700;padding:9px;border-radius:8px;cursor:pointer">Save Device →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OC Warning Modal -->
+  <div id="oc-modal">
+    <div class="oc-box">
+      <div class="oc-warn-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div class="oc-title">⚡ Manual Overclock Warning</div>
+      <div class="oc-desc">
+        Manual overrides push beyond auto-tuned safe limits.<br><br>
+        <strong>Risks:</strong> System instability, crashes, thermal throttling, or model errors if you exceed your hardware's actual capacity.<br><br>
+        Only proceed if you know your hardware well. Jane is not responsible for system issues.
+      </div>
+      <div class="oc-btns">
+        <button class="oc-cancel" onclick="document.getElementById('oc-modal').classList.remove('show')">Cancel</button>
+        <button class="oc-confirm" onclick="confirmOC()">I Understand →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drag & Drop overlay -->
+  <div id="dd-overlay">
+    <div class="dd-inner">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="rgba(124,92,252,.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="8" y="10" width="32" height="28" rx="4"/>
+        <path d="M24 20v10M19 25l5-5 5 5"/>
+        <path d="M16 38v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+      </svg>
+      <div class="dd-lbl">Drop file here</div>
+      <div class="dd-sub">Image, PDF, or text — Jane will read it</div>
+    </div>
+  </div>
+
+  <div id="panels">
+
+    <!-- ═══ CHAT ════ -->
+    <div class="panel on" id="p-chat">
+      <div id="welcome">
+        <div class="wlc-spark">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"
+            style="width:52px;height:52px;fill:#6d41be;">
+            <path d="M4 6h10v4h-4v4h4v4h-4v4h4v4h-10v-20zM22 6v4h-4v4h4v4h-4v4h4v4h6v-20h-6z"/>
+          </svg>
+        </div>
+        <div class="wlc-name">Hey — I'm Jane.</div>
+        <div class="wlc-sub">Ask me anything. I run fully on your machine via Visrodeck VRE. No cloud.</div>
+        <div class="chips">
+          <div class="chip" onclick="chip(this)">Explain this project</div>
+          <div class="chip" onclick="chip(this)">Find bugs in my code</div>
+          <div class="chip" onclick="chip(this)">Write a README</div>
+          <div class="chip" onclick="chip(this)">What is VRE?</div>
+          <div class="chip" onclick="chip(this)">What's on my screen?</div>
+          <div class="chip" onclick="chip(this)">Open Chrome</div>
+          <div class="chip" onclick="chip(this)">Run a shell command</div>
+          <div class="chip" onclick="chip(this)">Who made you?</div>
+        </div>
+      </div>
+      <div id="msgs" style="display:none"></div>
+      <div id="input-z">
+        <div id="mode-badges" style="display:flex;gap:5px;padding:0 14px 7px;flex-wrap:wrap"></div>
+        <div class="ibar">
+          <div id="img-preview-wrap" style="display:none;padding:6px 0 6px">
+            <div style="position:relative;display:inline-block">
+              <img id="img-thumb" style="max-height:60px;border-radius:6px;border:1px solid var(--b2)" src="" alt=""/>
+              <button onclick="clearImg()" style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--s3);border:1px solid var(--b2);color:var(--t2);cursor:pointer;font-size:9px;line-height:1;display:flex;align-items:center;justify-content:center">✕</button>
+            </div>
+          </div>
+          <textarea id="msg-in" rows="1" placeholder="Ask Jane anything…"
+            onkeydown="handleKey(event)" oninput="autoR(this)"></textarea>
+          <div style="display:flex;gap:4px;align-items:center">
+            <label class="ib" id="img-ib" title="Attach image for LLaVA vision" style="cursor:pointer">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="16" height="12" rx="2"/><circle cx="7.5" cy="8.5" r="1.5"/><path d="M2 14l4-4 3 3 2-2 4 3"/></svg>
+              <input type="file" id="img-file" accept="image/*" style="display:none" onchange="handleImgSelect(event)">
+            </label>
+            <button class="ib" id="screen-ib" onclick="toggleScreen()" title="Screen access">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="2" y="3" width="16" height="11" rx="2"/><path d="M6 17h8M10 14v3"/></svg>
+            </button>
+            <button class="ib" id="voice-ib" onclick="toggleVoice()" title="Voice TTS">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M11 5c1.5.9 2.5 2.7 2.5 5s-1 4.1-2.5 5"/><path d="M14 3c2.2 1.4 3.5 3.9 3.5 7s-1.3 5.6-3.5 7"/><rect x="3" y="7" width="4" height="5" rx="1"/><path d="M7 9.5l3-2.5v5l-3-2.5z"/></svg>
+            </button>
+            <button class="ib" id="mic-ib" onclick="startListen()" title="Voice input">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="7" y="2" width="6" height="10" rx="3"/><path d="M4 10a6 6 0 0012 0M10 16v3"/></svg>
+            </button>
+            <button id="send-btn" onclick="sendMsg()" disabled>
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V3M3 7l4-4 4 4"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ HISTORY ════ -->
+    <div class="panel" id="p-history">
+      <div class="ph">
+        <div>
+          <div class="ph-title">// HISTORY</div>
+          <div class="ph-sub">AI-named conversations — click to reload</div>
+        </div>
+        <div class="ph-right">
+          <button class="ph-btn" onclick="clearAllHistory()">Clear All</button>
+        </div>
+      </div>
+      <div class="hist-search">
+        <input class="hs-in" id="hs-in" placeholder="Search conversations…" oninput="filterHistory(this.value)">
+      </div>
+      <div class="hist-list" id="hist-list">
+        <div class="hist-empty" id="hist-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/>
+          </svg>
+          <div class="hist-empty-t">NO HISTORY YET</div>
+          <div class="hist-empty-s">Conversations appear here after you chat with Jane</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VOICE SESSION ════ -->
+    <div class="panel" id="p-voice">
+      <div class="ph">
+        <div>
+          <div class="ph-title">// VOICE SESSION</div>
+          <div class="ph-sub">Continuous voice conversation — Jarvis style</div>
+        </div>
+      </div>
+      <div class="vs-body">
+        <div id="vs-orb" onclick="toggleVoiceSession()">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round">
+            <rect x="7" y="2" width="6" height="11" rx="3"/>
+            <path d="M3 10a7 7 0 0014 0M10 17v3"/>
+          </svg>
+        </div>
+        <div id="vs-status">TAP TO START VOICE SESSION</div>
+        <div id="vs-transcript">Say "Hey Jane" or tap the orb to begin speaking. Jane will listen, respond, and speak back.</div>
+        <button id="vs-toggle" onclick="toggleVoiceSession()">START SESSION</button>
+        <div class="vs-hint">
+          Works best with FLOAT enabled (Settings).<br>
+          Say "stop" or "end session" to exit voice mode.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ APPS ════ -->
+    <div class="panel" id="p-apps">
+      <div class="ph">
+        <div>
+          <div class="ph-title">// LAUNCH</div>
+          <div class="ph-sub">Open apps, search the web, run commands</div>
+        </div>
+      </div>
+      <div class="apps-inner">
+        <div>
+          <div class="as-title">Search Google</div>
+          <div class="abar">
+            <input class="a-in" id="g-in" placeholder="Search query…" onkeydown="if(event.key==='Enter')gSearch()">
+            <button class="a-go" onclick="gSearch()">SEARCH</button>
+          </div>
+        </div>
+        <div>
+          <div class="as-title">Open Application</div>
+          <div class="abar">
+            <input class="a-in" id="app-in" placeholder="App name (notepad, chrome, spotify…)" onkeydown="if(event.key==='Enter')lApp()">
+            <button class="a-go" onclick="lApp()">OPEN</button>
+          </div>
+          <div class="apps-grid" id="ag" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS ════ -->
+    <div class="panel" id="p-settings">
+      <div class="ph"><div><div class="ph-title">// SETTINGS</div><div class="ph-sub">Configure Jane, VRE, and capabilities</div></div></div>
+      <div class="sett-inner">
+
+        <!-- HARDWARE -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <rect x="3" y="3" width="10" height="10" rx="1.5"/>
+              <rect x="5" y="5" width="6" height="6" rx="1" fill="currentColor" opacity=".25"/>
+              <line x1="3" y1="6" x2="1" y2="6"/><line x1="3" y1="8" x2="1" y2="8"/><line x1="3" y1="10" x2="1" y2="10"/>
+              <line x1="13" y1="6" x2="15" y2="6"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="13" y1="10" x2="15" y2="10"/>
+            </svg>
+            HARDWARE
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">GPU Acceleration</div><div class="sr-s">Active backend for llama-server inference</div></div>
+            <div id="hw-gpu-badge" class="hw-badge hw-badge-acc">—</div>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">CPU Threads</div><div class="sr-s">Threads allocated to Jane's inference engine</div></div>
+            <div id="hw-threads-badge" class="hw-badge">—</div>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Change Hardware Setup</div><div class="sr-s">Re-run GPU / CPU / dependency wizard — applies on next model load</div></div>
+            <button onclick="openHardwareSetup()" style="background:var(--purple);border:none;color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;padding:7px 14px;border-radius:6px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">OPEN SETUP →</button>
+          </div>
+        </div>
+
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M9 4c1.3.7 2.2 2.2 2.2 4S10.3 11.3 9 12"/>
+              <path d="M12 2c2 1.4 3.2 3.8 3.2 6s-1.2 4.6-3.2 6"/>
+              <rect x="2" y="6" width="4" height="4" rx="1"/>
+              <path d="M6 8l2.5-2v4L6 8z"/>
+            </svg>
+            VOICE
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Text to Speech</div><div class="sr-s">Jane speaks responses aloud (Windows SAPI, fully local)</div></div>
+            <div class="tog" id="tts-t" onclick="toggleTTS()"></div>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Voice / TTS Voice</div><div class="sr-s">Select voice — auto-selects female voices on Windows</div></div>
+            <select class="v-sel" id="v-sel" onchange="setVoice(this.value)"><option value="">Default</option></select>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Microphone Input</div><div class="sr-s">Enable voice-to-text (Windows SAPI dictation, local)</div></div>
+            <div class="tog" id="stt-t" onclick="toggleSTT()"></div>
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">Whisper NLP</div>
+              <div class="sr-s">Better voice recognition via Whisper (install whisper.cpp or openai-whisper first)</div>
+            </div>
+            <div class="tog" id="whisper-t" onclick="toggleWhisper()"></div>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Hey Jane — Wake Word</div><div class="sr-s">Say "Hey Jane" to activate FLOAT from any app</div></div>
+            <div class="tog" id="wake-t" onclick="toggleWake()"></div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <rect x="1" y="2" width="14" height="10" rx="2"/><path d="M5 14h6M8 12v2"/>
+            </svg>
+            SCREEN
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Screen Access</div><div class="sr-s">Allow Jane to capture and analyze your screen — uses LLaVA 1.5 for vision (pull it first)</div></div>
+            <div class="tog" id="scr-t" onclick="toggleScr()"></div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <rect x="2" y="2" width="12" height="12" rx="2"/>
+              <path d="M8 5v6M5 8h6"/>
+            </svg>
+            OVERLAY
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Floating Overlay</div><div class="sr-s">Show Jane as a small always-on-top window over other apps (Alt+Space)</div></div>
+            <div id="ovl-btn" onclick="toggleOverlay()"></div>
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">FLOAT</div>
+              <div class="sr-s">Top-center floating pill for Hey Jane voice activation and task monitoring</div>
+            </div>
+            <div class="tog" id="island-t" onclick="toggleIsland()"></div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M14 10a2 2 0 01-2 2H4l-3 3V4a2 2 0 012-2h9a2 2 0 012 2v6z"/>
+            </svg>
+            RESOURCES
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">Performance Mode</div>
+              <div class="sr-s">High: 60% CPU/GPU. Default: 30%. Restart Jane after changing.</div>
+            </div>
+            <div class="tog" id="perf-t" onclick="togglePerf()"></div>
+          </div>
+        </div>
+
+        <!-- AI BEHAVIOUR -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="6" r="3"/><path d="M2 14a6 6 0 0112 0"/>
+              <path d="M8 9v2M6 11h4"/>
+            </svg>
+            AI BEHAVIOUR
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">Think Extended</div>
+              <div class="sr-s">Jane reasons deeper before answering — slower but smarter. Toggle per-message with the badge too.</div>
+            </div>
+            <div class="tog" id="think-t" onclick="toggleThinkExtended()"></div>
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">Recall Mode</div>
+              <div class="sr-s">Jane reviews full chat history for context before each response — great for long projects.</div>
+            </div>
+            <div class="tog" id="recall-t" onclick="toggleRecall()"></div>
+          </div>
+          <div class="sr" style="border-top:1px solid var(--b1);margin-top:4px;padding-top:12px">
+            <div class="sr-i">
+              <div class="sr-l" style="color:#f472b6">Lewd Mode 🔞</div>
+              <div class="sr-s" style="color:#78716c">Enables girlfriend persona — Jane becomes affectionate and intimate. Adults only.</div>
+            </div>
+            <div class="tog" id="lewd-t" onclick="toggleLewd()"></div>
+          </div>
+        </div>
+
+        <!-- TUNING -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/>
+            </svg>
+            AUTO-TUNING
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">Auto-Tune on Startup</div>
+              <div class="sr-s">Run stress test and set optimal parameters every launch</div>
+            </div>
+            <div class="tog" id="tune-t" onclick="toggleAutoTune()"></div>
+          </div>
+
+          <!-- Results grid -->
+          <div id="tune-params" style="display:none;margin:4px 0 8px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 0 2px">
+              <div class="tune-tile"><div class="tune-k">CONTEXT</div><div class="tune-v" id="tune-ctx">—</div></div>
+              <div class="tune-tile"><div class="tune-k">MAX TOKENS</div><div class="tune-v" id="tune-tok">—</div></div>
+              <div class="tune-tile"><div class="tune-k">BATCH SIZE</div><div class="tune-v" id="tune-bat">—</div></div>
+              <div class="tune-tile"><div class="tune-k">THREADS</div><div class="tune-v" id="tune-thr">—</div></div>
+            </div>
+            <div id="tune-score-row" style="display:none;margin-top:6px;padding:8px 10px;background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.15);border-radius:8px">
+              <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:3px">STRESS TEST RESULT</div>
+              <div style="font-size:12px;font-weight:600;color:var(--t1)" id="tune-score">—</div>
+            </div>
+          </div>
+
+          <!-- Stress test button + progress -->
+          <div class="sr" style="margin-top:2px">
+            <div class="sr-i"><div class="sr-l">Run Stress Test + Tune</div><div class="sr-s" id="tune-run-sub">Measures your device, finds optimal settings</div></div>
+            <button id="tune-run-btn" onclick="runAutoTune()" style="background:var(--purple);border:none;color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">RUN TEST →</button>
+          </div>
+          <div id="tune-progress" style="display:none;padding:6px 0 2px">
+            <div style="height:2px;background:var(--b1);border-radius:2px;overflow:hidden;margin-bottom:6px">
+              <div id="tune-prog-bar" style="height:100%;width:0%;background:var(--purple);transition:width .3s;border-radius:2px"></div>
+            </div>
+            <div id="tune-prog-txt" style="font-size:10px;color:var(--t3);font-family:var(--mono)">Preparing…</div>
+          </div>
+
+          <!-- Manual overclocking -->
+          <div style="border-top:1px solid var(--b1);margin-top:10px;padding-top:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:11px;font-weight:600;color:var(--t2)">Manual Override</div>
+              <button onclick="showOCWarning()" style="font-family:var(--mono);font-size:9px;font-weight:700;padding:4px 10px;border-radius:5px;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.08);color:#fbbf24;cursor:pointer;letter-spacing:.06em">OVERCLOCK ⚡</button>
+            </div>
+            <div id="oc-panel" style="display:none">
+              <div style="margin-bottom:8px">
+                <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:4px;display:flex;justify-content:space-between"><span>GPU LAYERS</span><span id="oc-gpu-val" style="color:var(--purple)">99</span></div>
+                <input type="range" id="oc-gpu" min="0" max="128" value="99" oninput="document.getElementById('oc-gpu-val').textContent=this.value" style="width:100%">
+              </div>
+              <div style="margin-bottom:8px">
+                <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:4px;display:flex;justify-content:space-between"><span>CONTEXT SIZE</span><span id="oc-ctx-val" style="color:var(--purple)">4096</span></div>
+                <input type="range" id="oc-ctx" min="512" max="32768" step="512" value="4096" oninput="document.getElementById('oc-ctx-val').textContent=this.value" style="width:100%">
+              </div>
+              <div style="margin-bottom:8px">
+                <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:4px;display:flex;justify-content:space-between"><span>BATCH SIZE</span><span id="oc-bat-val" style="color:var(--purple)">512</span></div>
+                <input type="range" id="oc-bat" min="64" max="2048" step="64" value="512" oninput="document.getElementById('oc-bat-val').textContent=this.value" style="width:100%">
+              </div>
+              <div style="margin-bottom:10px">
+                <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:4px;display:flex;justify-content:space-between"><span>THREADS</span><span id="oc-thr-val" style="color:var(--purple)">4</span></div>
+                <input type="range" id="oc-thr" min="1" max="32" value="4" oninput="document.getElementById('oc-thr-val').textContent=this.value" style="width:100%">
+              </div>
+              <button onclick="applyOC()" style="width:100%;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:#fbbf24;font-family:var(--mono);font-size:9px;font-weight:700;padding:8px;border-radius:6px;cursor:pointer;letter-spacing:.06em;transition:all .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">APPLY OVERRIDES →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FONT -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M2 12l4-8 4 8M3.5 9h5M10 4h4M12 4v8"/>
+            </svg>
+            FONT
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">UI Font</div>
+              <div class="sr-s">Changes the interface and chat font — system fonts are built-in</div>
+            </div>
+            <select id="font-sel" class="v-sel" onchange="setFont(this.value)" style="min-width:130px">
+              <option value="system">System Default</option>
+              <option value="mono">Monospace</option>
+              <option value="serif">Serif</option>
+              <option value="custom">Custom (uploaded)</option>
+            </select>
+          </div>
+          <div class="sr" id="font-upload-row" style="display:none">
+            <div class="sr-i">
+              <div class="sr-l">Upload Custom Font</div>
+              <div class="sr-s" id="font-upload-name">No font uploaded (.ttf, .otf, .woff2)</div>
+            </div>
+            <label style="background:var(--s2);border:1px solid var(--b2);color:var(--t2);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap">
+              UPLOAD
+              <input type="file" id="font-file" accept=".ttf,.otf,.woff,.woff2" style="display:none" onchange="handleFontUpload(event)">
+            </label>
+          </div>
+        </div>
+
+
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <rect x="4" y="7" width="8" height="8" rx="1"/><path d="M6 7V5a2 2 0 014 0v2"/><circle cx="8" cy="11" r="1"/>
+            </svg>
+            LICENSE
+          </div>
+          <div class="lic-r"><div class="lic-k">Status</div><div class="lic-v" id="ls" style="color:#22c55e">ACTIVE</div></div>
+          <div class="lic-r"><div class="lic-k">Key</div><div class="lic-v" id="lk">—</div></div>
+          <div class="lic-r"><div class="lic-k">Device</div><div class="lic-v" id="ld">—</div></div>
+          <div class="lic-r"><div class="lic-k">Activated On</div><div class="lic-v" id="la">—</div></div>
+          <div class="lic-r"><div class="lic-k">Signature</div><div class="lic-v">Visrodeck Technology</div></div>
+          <div class="lic-r"><div class="lic-k">Publisher</div><div class="lic-v">Visrodeck Technology Pvt Ltd.</div></div>
+        </div>
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="7"/><path d="M8 7v5M8 5h.01"/>
+            </svg>
+            ABOUT
+          </div>
+          <div class="lic-r"><div class="lic-k">Jane</div><div class="lic-v">v1.8.0 — AI System Operator</div></div>
+          <div class="lic-r"><div class="lic-k">VRE</div><div class="lic-v">v2.0.0 — Visrodeck Runtime Environment</div></div>
+          <div class="lic-r"><div class="lic-k">Runtime</div><div class="lic-v">Powered by llama-server · llama.cpp</div></div>
+          <div class="lic-r"><div class="lic-k">Models</div><div class="lic-v">Powered by Llama — LLaVA 1.5 · Llama 3.2 3B · Dolphin Mistral 7B</div></div>
+          <div class="lic-r"><div class="lic-k">Storage</div><div class="lic-v">AES-256-GCM · encrypted on-device</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ AUTOMATION ════ -->
+    <div class="panel" id="p-automation">
+      <div class="ph"><div><div class="ph-title">// AUTOMATION</div><div class="ph-sub">Cloud APIs, device control, and smart integrations</div></div></div>
+      <div class="sett-inner" style="overflow-y:auto">
+
+        <!-- CLOUD AI APIS -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M4 10a4 4 0 010-8h8a2.5 2.5 0 010 5H6a1.5 1.5 0 000 3h7"/>
+            </svg>
+            CLOUD AI APIS
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Active API</div><div class="sr-s">Currently routing through — Local is always private</div></div>
+            <select id="api-mode" class="v-sel" onchange="setApiMode(this.value)" style="min-width:130px">
+              <option value="local">🔒 Local (llama.cpp)</option>
+              <option value="openai">OpenAI GPT</option>
+              <option value="gemini">Google Gemini</option>
+            </select>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Add / Change API Key</div><div class="sr-s" id="api-status-txt">No external key configured</div></div>
+            <button onclick="openApiSetup()" style="background:var(--purple);border:none;color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;padding:6px 14px;border-radius:6px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">CONFIGURE →</button>
+          </div>
+          <div id="api-disclaimer" style="display:none;margin-top:6px;padding:10px 12px;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:8px;font-size:11px;color:var(--t3);line-height:1.6">
+            ⚠️ <strong style="color:var(--t2)">Privacy Notice:</strong> When using cloud APIs, your messages are sent to external servers. Visrodeck is not responsible for any data handled by third-party API providers. Use at your own discretion.
+          </div>
+        </div>
+
+        <!-- DEVICE CONTROL -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="6"/><path d="M8 4v4l3 1.5"/>
+            </svg>
+            DEVICE CONTROL
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Enable Device Control</div><div class="sr-s">Let Jane control smart devices over your local network</div></div>
+            <div class="tog" id="dev-ctrl-t" onclick="toggleDevControl()"></div>
+          </div>
+          <div id="dev-ctrl-panel" style="display:none">
+            <div class="sr">
+              <div class="sr-i"><div class="sr-l">Add Device</div><div class="sr-s">IP/hostname, type (HTTP relay, Arduino serial, MQTT)</div></div>
+              <button onclick="openAddDevice()" style="background:var(--s2);border:1px solid var(--b2);color:var(--t2);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .15s">+ ADD DEVICE</button>
+            </div>
+            <div id="device-list" style="margin-top:8px;display:flex;flex-direction:column;gap:6px"></div>
+            <div style="margin-top:10px;padding:8px 10px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;font-size:11px;color:var(--t3);line-height:1.6">
+              💡 Jane can control devices via HTTP endpoints, Arduino serial (coming soon), MQTT broker, or Raspberry Pi GPIO via pigpio REST. Just add a device and tell Jane to <em>"turn on the lights"</em>.
+            </div>
+          </div>
+        </div>
+
+        <!-- WHISPER AUTO-PULL -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <rect x="5.5" y="1" width="5" height="8" rx="2.5"/>
+              <path d="M2.5 8a5.5 5.5 0 0011 0M8 13.5v2M5.5 15.5h5"/>
+            </svg>
+            WHISPER VOICE ENGINE
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Whisper Status</div><div class="sr-s" id="whisper-status-txt">Checking…</div></div>
+            <div id="whisper-status-badge" class="hw-badge">—</div>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Auto-Download Whisper</div><div class="sr-s">Downloads whisper.cpp server and base.en model automatically</div></div>
+            <button id="whisper-pull-btn" onclick="pullWhisper()" style="background:var(--purple);border:none;color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;padding:6px 14px;border-radius:6px;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">INSTALL →</button>
+          </div>
+          <div id="whisper-pull-progress" style="display:none;padding:6px 0">
+            <div style="height:2px;background:var(--b1);border-radius:2px;overflow:hidden;margin-bottom:6px"><div id="whisper-prog-bar" style="height:100%;width:0%;background:var(--purple);transition:width .3s;border-radius:2px"></div></div>
+            <div id="whisper-prog-txt" style="font-size:10px;color:var(--t3);font-family:var(--mono)">Preparing…</div>
+          </div>
+        </div>
+
+        <!-- HOTKEYS -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <rect x="2" y="4" width="12" height="9" rx="2"/>
+              <path d="M5 8h1M8 8h1M11 8h1M5 11h6"/>
+            </svg>
+            HOTKEYS
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Open/Close Jane</div><div class="sr-s">Global shortcut to show or hide the main window</div></div>
+            <div class="hk-badge" id="hk-main" onclick="editHotkey('main')" title="Click to change">Alt+Space</div>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Toggle Float</div><div class="sr-s">Show/hide the floating pill overlay</div></div>
+            <div class="hk-badge" id="hk-float" onclick="editHotkey('float')" title="Click to change">Alt+J</div>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Screen Capture</div><div class="sr-s">Instantly capture screen and send to Jane</div></div>
+            <div class="hk-badge" id="hk-screen" onclick="editHotkey('screen')" title="Click to change">Alt+S</div>
+          </div>
+          <div id="hk-recording" style="display:none;margin-top:6px;padding:10px 12px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.2);border-radius:8px;font-size:11px;text-align:center;color:#a78bfa">Press any key combination… (Esc to cancel)</div>
+        </div>
+
+        <!-- CHAT EXPORT -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V7l-4-5z"/>
+              <path d="M9 2v5h5M5 9h6M5 12h4"/>
+            </svg>
+            CHAT EXPORT
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Export as Markdown</div><div class="sr-s">Save current conversation as a .md file</div></div>
+            <button onclick="exportChat('md')" style="background:var(--s2);border:1px solid var(--b2);color:var(--t2);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='var(--s2)'">EXPORT .MD</button>
+          </div>
+          <div class="sr">
+            <div class="sr-i"><div class="sr-l">Export as JSON</div><div class="sr-s">Raw conversation data for analysis or backup</div></div>
+            <button onclick="exportChat('json')" style="background:var(--s2);border:1px solid var(--b2);color:var(--t2);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='var(--s2)'">EXPORT .JSON</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ PERSONALIZATION ════ -->
+    <div class="panel" id="p-persona">
+      <div class="ph"><div><div class="ph-title">// PERSONALIZE</div><div class="ph-sub">Make Jane yours — name, tone, theme, wake word</div></div></div>
+      <div class="sett-inner" style="overflow-y:auto">
+
+        <!-- Names -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="5" r="3"/><path d="M2 14a6 6 0 0112 0"/>
+            </svg>
+            NAMES
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">Your Name</div>
+              <div class="sr-s">Jane will address you by this name</div>
+            </div>
+            <div style="width:180px">
+              <input class="pf-in" id="pf-username" placeholder="User" maxlength="32">
+            </div>
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">AI Name</div>
+              <div class="sr-s">What you want to call your assistant</div>
+            </div>
+            <div style="width:180px">
+              <input class="pf-in" id="pf-ainame" placeholder="Jane" maxlength="32">
+            </div>
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">Wake Word</div>
+              <div class="sr-s">Phrase to activate FLOAT (default: "Hey Jane")</div>
+            </div>
+            <div style="width:180px">
+              <input class="pf-in" id="pf-wakeword" placeholder="Hey Jane" maxlength="48">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tone -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M2 4h12M2 8h8M2 12h5"/>
+            </svg>
+            RESPONSE TONE
+          </div>
+          <div class="sr" style="flex-direction:column;align-items:stretch;gap:10px">
+            <div class="sr-i">
+              <div class="sr-l">Tone Style</div>
+              <div class="sr-s">How Jane phrases responses</div>
+            </div>
+            <div class="tone-grid">
+              <button class="tone-btn on" id="tone-balanced"    onclick="setTone('balanced')">Balanced</button>
+              <button class="tone-btn"    id="tone-casual"      onclick="setTone('casual')">Casual</button>
+              <button class="tone-btn"    id="tone-professional" onclick="setTone('professional')">Professional</button>
+              <button class="tone-btn"    id="tone-direct"      onclick="setTone('direct')">Direct</button>
+            </div>
+          </div>
+          <div class="sr" style="flex-direction:column;align-items:stretch;gap:8px">
+            <div class="sr-i">
+              <div class="sr-l">Custom Instructions</div>
+              <div class="sr-s">Anything extra — expertise, style, restrictions, facts about you</div>
+            </div>
+            <textarea class="pf-in pf-ta" id="pf-instructions" placeholder="e.g. I'm a Python developer. Always give code examples. Be concise."></textarea>
+          </div>
+        </div>
+
+        <!-- Theme -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/>
+              <path d="M8 2v2M8 12v2M2 8h2M12 8h2"/>
+            </svg>
+            COLOR THEME
+          </div>
+          <div class="sr" style="flex-direction:column;align-items:stretch;gap:12px">
+            <div class="theme-row">
+              <div class="theme-swatch t-original on" id="sw-original" onclick="setTheme('original')" title="Original Dark">
+                <span>DARK</span>
+              </div>
+              <div class="theme-swatch t-white" id="sw-white" onclick="setTheme('white')" title="Light / White">
+                <span style="color:rgba(0,0,0,.55)">LIGHT</span>
+              </div>
+              <div class="theme-swatch t-custom" id="sw-custom" onclick="setTheme('custom')" title="Custom Accent">
+                <span>CUSTOM</span>
+              </div>
+            </div>
+            <div class="accent-row">
+              <span class="accent-lbl">ACCENT COLOR</span>
+              <input type="color" id="accent-picker" value="#7c3aed" oninput="onAccentPick(this.value)">
+              <input class="pf-in" id="accent-hex" value="#7c3aed" maxlength="7" placeholder="#7c3aed" oninput="onAccentHex(this.value)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto model switch -->
+        <div class="sc">
+          <div class="sc-h">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M3 8a5 5 0 019.9-1M13 8a5 5 0 01-9.9 1"/><path d="M1 7l2 1 1-2M15 9l-2-1-1 2"/>
+            </svg>
+            AUTO MODEL SWITCH
+          </div>
+          <div class="sr">
+            <div class="sr-i">
+              <div class="sr-l">Auto-Switch on Refusal</div>
+              <div class="sr-s">If the current model refuses to answer, Jane automatically switches to Dolphin Mistral and retries — silently</div>
+            </div>
+            <div class="tog on" id="auto-sw-t" onclick="toggleAutoSwitch()"></div>
+          </div>
+        </div>
+
+        <button class="pf-save" onclick="savePersonalization()">SAVE PREFERENCES</button>
+      </div>
+    </div>
+
+  </div><!-- /panels -->
+</div><!-- /body -->
+
+<!-- Auto-switch toast -->
+<div id="auto-switch-toast">
+  <svg viewBox="0 0 16 16" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round">
+    <path d="M3 8a5 5 0 019.9-1M13 8a5 5 0 01-9.9 1"/><path d="M1 7l2 1 1-2M15 9l-2-1-1 2"/>
+  </svg>
+  <span id="ast-txt">Auto-switched model</span>
+</div>
+
+<div id="sb">
+  <div class="sb-dot pulse" id="sb-d"></div>
+  <span id="sb-txt">Connecting to VRE…</span>
+  <div style="color:var(--t3);font-size:10px">Visrodeck Technology · VRE v2.0</div>
+</div>
+</div>
+
+<!-- Approval overlay -->
+<div id="aov">
+  <div class="ab">
+    <div class="ab-ico"><svg viewBox="0 0 26 26" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="#f59e0b" stroke-width="1.5" d="M13 3L2 22h22L13 3z"/>
+      <path stroke="#f59e0b" stroke-width="2" d="M13 10v6M13 19h.01"/>
+    </svg></div>
+    <div class="ab-t">APPROVAL REQUIRED</div>
+    <div class="ab-s">Jane wants to perform an action that requires your explicit permission.</div>
+    <div class="ab-d" id="ab-d"></div>
+    <div class="ab-btns">
+      <button class="ab-btn no" onclick="respond(false)">DENY</button>
+      <button class="ab-btn ok" onclick="respond(true)">APPROVE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════
+const S = {
+  connected:false,busy:false,ttsOn:false,sttOn:false,scrOn:false,
+  whisperOn:false,perfHigh:false,
+  voiceName:'',model:'llama3.2:3b',pendingApproval:null,
+  overlayOn:false,islandOn:false,wakeOn:false,
+  voiceSessionOn:false,
+};
+
+// ── 3 supported models ────────────────────────────────────
+const MODELS = [
+  {
+    id:      'llava:1.5',
+    label:   'LLaVA 1.5',
+    desc:    'Vision + Language — sees your screen, analyzes images',
+    size:    '4.7 GB',
+    badges:  ['VISION'],
+    icon:    `<svg class="mm-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round">
+      <circle cx="10" cy="10" r="3.5"/>
+      <path d="M2 10s3.5-6 8-6 8 6 8 6-3.5 6-8 6-8-6-8-6z"/>
+    </svg>`,
+  },
+  {
+    id:      'llama3.2:3b',
+    label:   'Llama 3.2 3B',
+    desc:    'Default general-purpose model — fast, capable, daily driver',
+    size:    '2.0 GB',
+    badges:  ['DEFAULT'],
+    def:     true,
+    icon:    `<svg class="mm-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round">
+      <path d="M18 13a2 2 0 01-2 2H6l-4 3V5a2 2 0 012-2h12a2 2 0 012 2z"/>
+    </svg>`,
+  },
+  {
+    id:      'dolphin-mistral:7b',
+    label:   'Dolphin Mistral 7B',
+    desc:    'Uncensored 7B — no restrictions, unrestricted responses',
+    size:    '4.4 GB',
+    badges:  ['UNCENSORED'],
+    unc:     true,
+    icon:    `<svg class="mm-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round">
+      <rect x="6" y="9" width="8" height="9" rx="1"/>
+      <path d="M8 9V7a2 2 0 114 0v2"/>
+      <path d="M10 13v2"/>
+    </svg>`,
+  },
+];
+
+const TOOL_ICONS = {
+  'web.search':`<svg class="tc-ico" viewBox="0 0 14 14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="4.5"/><path d="M10 10l2.5 2.5"/></svg>`,
+  'web.fetch': `<svg class="tc-ico" viewBox="0 0 14 14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="1" width="12" height="12" rx="2"/><path d="M7 4v6M4 7h6"/></svg>`,
+  'fs.read':   `<svg class="tc-ico" viewBox="0 0 14 14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"><path d="M8 1H3a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6L8 1z"/><path d="M8 1v5h4"/></svg>`,
+  'fs.write':  `<svg class="tc-ico" viewBox="0 0 14 14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"><path d="M9 2l3 3-6.5 6.5H2v-3L9 2z"/></svg>`,
+  'shell.safe':`<svg class="tc-ico" viewBox="0 0 14 14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="2" width="12" height="10" rx="2"/><path d="M4 6l2 2-2 2M8 10h3"/></svg>`,
+  'app.launch':`<svg class="tc-ico" viewBox="0 0 14 14" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>`,
+  'screen.describe':`<svg class="tc-ico" viewBox="0 0 14 14" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="1" width="12" height="9" rx="1.5"/><path d="M4 13h6M7 10v3"/></svg>`,
+};
+const DI=`<svg class="tc-ico" viewBox="0 0 14 14" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg>`;
+
+let currentChatId = null, currentMessages = [], chatHistory = [];
+
+// ══════════════════════════════════════════════════════════
+//  IPC EVENTS
+// ══════════════════════════════════════════════════════════
+// Track whether llama-server is actually ready (not just VRE)
+let _llamaReady = false;
+
+window.jane.on('status', d => {
+  S.connected = d.connected;
+  S.model     = d.model || S.model;
+  document.getElementById('m-name').textContent = S.model;
+  setSb(d.message, d.connected);
+
+  // Detect llama ready from message content
+  if (d.message && (d.message.includes('✓ Ready') || d.message.includes('Model loaded'))) {
+    _llamaReady = true;
+    setInp(true);
+    document.getElementById('send-btn').disabled = !!document.getElementById('msg-in').value.trim() ? false : true;
+  } else if (d.message && (d.message.includes('Loading model') || d.message.includes('loading AI'))) {
+    _llamaReady = false;
+    // Show loading indicator in input placeholder
+    const inp = document.getElementById('msg-in');
+    if (inp && !S.busy) inp.placeholder = 'Loading model… please wait';
+  } else if (_llamaReady && d.message && (d.message.includes('failed') || d.message.includes('crashed'))) {
+    _llamaReady = false;
+  }
+
+  // Restore placeholder when ready
+  if (_llamaReady) {
+    const inp = document.getElementById('msg-in');
+    if (inp) inp.placeholder = 'Ask Jane anything…';
+  }
+
+  if (d.needsInstall) setSb('⚠ No model found — open the model selector (top bar) and click DOWNLOAD', false);
+});
+window.jane.on('agent:event', e => {
+  switch(e.type) {
+    case 'thinking':    showMsgs(); showThk(e.step,e.max); break;
+    case 'tool_call':   hideThk(); showMsgs(); addTC(e.callId,e.tool,e.params); break;
+    case 'tool_result': updateTC(e.callId,e.result,e.success); hideThk(); break;
+    case 'response':
+      hideThk();
+      // If we streamed chunks, the bubble already exists — just finalize it
+      if (_streamingEl) { _finalizeStream(e.text); }
+      else              { addJane(e.text); }
+      if(S.ttsOn) showWave();
+      break;
+    case 'error':       hideThk(); _finalizeStream(); addJane(e.message,true); break;
+  }
+  if(S.voiceSessionOn && e.type==='response') {
+    vsStatus('Jane is speaking…');
+    setTimeout(()=>{ if(S.voiceSessionOn && !S.busy) vsListen(); },1200);
+  }
+});
+
+// ── Streaming token-by-token rendering ─────────────────────
+let _streamingEl = null;   // the current .bub-wrap element being streamed into
+let _streamTextNode = null;
+
+window.jane.on('chat:chunk', ({text}) => {
+  if (!text) return;
+  showMsgs(); hideThk();
+  if (!_streamingEl) {
+    // Create the bubble shell now, fill it incrementally
+    const el = document.createElement('div');
+    el.className = 'mr jane streaming';
+    el.innerHTML = `<div class="av jane"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:#6d41be"><path d="M4 6h10v4h-4v4h4v4h-4v4h4v4h-10v-20zM22 6v4h-4v4h4v4h-4v4h4v4h6v-20h-6z"/></svg></div>
+     <div class="bub-wrap" style="position:relative"><div class="bub" id="stream-bub"></div></div>
+     <span class="mts">${ts()}</span>`;
+    ms().appendChild(el);
+    _streamingEl  = el;
+    _streamTextNode = document.createTextNode('');
+    document.getElementById('stream-bub').appendChild(_streamTextNode);
+    scrollB();
+  }
+  _streamTextNode.textContent += text;
+  scrollB();
+});
+
+function _finalizeStream(fullText) {
+  if (_streamingEl) {
+    _streamingEl.classList.remove('streaming');
+    // Replace plain text node with formatted + copy button version
+    const bub = _streamingEl.querySelector('.bub');
+    const wrap = _streamingEl.querySelector('.bub-wrap');
+    if (bub && fullText) {
+      bub.innerHTML = linkify(fmt(fullText));
+    }
+    // Add copy button
+    if (wrap) {
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-btn';
+      copyBtn.title = 'Copy';
+      copyBtn.onclick = function() { copyBub(this); };
+      copyBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5"/></svg>';
+      wrap.appendChild(copyBtn);
+      wrap.addEventListener('mouseenter', () => copyBtn.style.display = 'flex');
+      wrap.addEventListener('mouseleave', () => { if (!copyBtn.classList.contains('copied')) copyBtn.style.display = 'none'; });
+    }
+    if (fullText) currentMessages.push({role:'jane', text:fullText, time:Date.now()});
+    _streamingEl  = null;
+    _streamTextNode = null;
+  }
+}
+window.jane.on('agent:done', () => {
+  S.busy=false; setInp(true); hideWave();
+  setSb('Ready',S.connected);
+  saveCurrentChat();
+});
+window.jane.on('approval', p => { S.pendingApproval=p.approvalId; showAppr(p); });
+window.jane.on('voice:transcript', d => {
+  const i=document.getElementById('msg-in');
+  if(d.transcript) {
+    i.value=d.transcript; autoR(i); setSb('Transcript ready',S.connected);
+    if(S.voiceSessionOn) { sendMsg(); return; }
+  } else setSb('Voice: '+(d.error||'no speech'),S.connected);
+  i.focus();
+  document.getElementById('mic-ib').classList.remove('listening');
+  if(S.voiceSessionOn) vsStatus('Say something…');
+});
+// ══════════════════════════════════════════════════════════
+//  PULL SCENE
+// ══════════════════════════════════════════════════════════
+let pullActive = false;
+
+function showPullScene(title, sub) {
+  pullActive = true;
+  document.getElementById('ps-title').textContent = title || 'PULLING MODEL';
+  document.getElementById('ps-sub').textContent   = sub   || 'Downloading…';
+  document.getElementById('ps-pct').textContent   = '0%';
+  document.getElementById('ps-bar').style.width   = '0%';
+  document.getElementById('ps-meta').textContent  = '—';
+  document.getElementById('pull-scene').classList.add('on');
+}
+
+function updatePullScene(pct, meta) {
+  document.getElementById('ps-pct').textContent  = pct + '%';
+  document.getElementById('ps-bar').style.width  = pct + '%';
+  if (meta) document.getElementById('ps-meta').textContent = meta;
+}
+
+function hidePullScene() {
+  pullActive = false;
+  document.getElementById('pull-scene').classList.remove('on');
+}
+
+function cancelPull() {
+  hidePullScene();
+  setSb('Download cancelled', S.connected);
+}
+
+// llama-server download events
+window.jane.on('llama:download:start', d => {
+  const gpuLabel = {nvidia:'CUDA', amd:'Vulkan', intel:'Vulkan', cpu:'AVX2'}[d.gpu] || 'CPU';
+  showPullScene('DOWNLOADING LLAMA-SERVER', `Fetching the ${gpuLabel} build for your GPU — this is a one-time setup`);
+});
+window.jane.on('llama:download:progress', d => {
+  if (d.status === 'extracting') {
+    updatePullScene(100, 'Extracting…');
+    document.getElementById('ps-title').textContent = 'EXTRACTING';
+    document.getElementById('ps-sub').textContent = 'Unpacking llama-server…';
+  } else {
+    updatePullScene(d.pct || 0, d.name ? `${d.name} — ${d.sizeMB || '?'} MB` : null);
+  }
+});
+window.jane.on('llama:download:done', d => {
+  hidePullScene();
+  if (d.success) {
+    setSb('llama-server installed ✓', S.connected);
+    updateLlamaBanner(true);
+  } else {
+    setSb('llama-server download failed — ' + (d.error || 'check logs'), false);
+  }
+});
+
+async function downloadLlama() {
+  closeMM();
+  showPullScene('DOWNLOADING LLAMA-SERVER', 'Fetching release info from GitHub…');
+  const result = await window.jane.downloadLlama().catch(e => ({ success: false, error: e.message }));
+  if (!result.success && !pullActive) {
+    // If pull scene was already hidden (by event), do nothing
+  }
+}
+
+function updateLlamaBanner(hasLlama) {
+  const banner = document.getElementById('mm-llama-banner');
+  const title  = document.getElementById('mm-lb-title');
+  const sub    = document.getElementById('mm-lb-sub');
+  if (hasLlama) {
+    banner.classList.add('ok');
+    title.textContent = 'llama-server ready';
+    sub.textContent   = 'Engine installed — models can run locally';
+  } else {
+    banner.classList.remove('ok');
+    title.textContent = 'llama-server not found';
+    sub.textContent   = 'Auto-download the correct build for your GPU';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  MODEL MODAL
+// ══════════════════════════════════════════════════════════
+let installedModels = new Set(['llama3.2:3b']);
+let customModels    = [];
+
+async function loadInstalledModels() {
+  const res = await window.jane.listModels().catch(()=>({ models:['llama3.2:3b'], custom:[] }));
+  installedModels = new Set(res.models || []);
+  customModels    = res.custom || [];
+}
+
+function buildMM() {
+  const c = document.getElementById('mm-cards');
+  c.innerHTML = '';
+
+  // Standard models
+  MODELS.forEach(m => {
+    const inst  = installedModels.has(m.id);
+    const isCur = m.id === S.model;
+    const card  = document.createElement('div');
+    card.className = 'mm-card' + (isCur ? ' cur' : '');
+    card.id = 'mmcard-' + m.id.replace(/[:.]/g,'_');
+    const badgeHtml = m.badges.map(b=>{
+      const cls = b==='VISION'?'vision':b==='DEFAULT'?'default':b==='UNCENSORED'?'unc':'';
+      return `<span class="mm-badge ${cls}">${b}</span>`;
+    }).join('');
+    card.innerHTML = `
+      <div class="mm-icon-wrap">${m.icon}</div>
+      <div class="mm-info">
+        <div class="mm-name">${m.label}</div>
+        <div class="mm-desc">${m.desc}</div>
+        <div class="mm-meta">${badgeHtml}<span class="mm-badge size">${m.size}</span></div>
+      </div>
+      <div class="mm-actions">
+        <div class="mm-status">
+          <div class="mm-st-dot ${inst?'installed':'missing'}"></div>
+          <span class="mm-st-txt">${inst?'INSTALLED':'NOT PULLED'}</span>
+        </div>
+        ${isCur
+          ? `<button class="mm-btn active">ACTIVE</button>`
+          : inst
+            ? `<button class="mm-btn select" onclick="selectModel('${m.id}',event)">SELECT</button>`
+            : `<button class="mm-btn pull" onclick="pullMM('${m.id}',event)">DOWNLOAD</button>`
+        }
+      </div>`;
+    if (!isCur && inst) card.addEventListener('click', e => { if(e.target.tagName==='BUTTON') return; selectModel(m.id, e); });
+    c.appendChild(card);
+  });
+
+  // Custom models (any .gguf in models dir)
+  customModels.forEach(cm => {
+    const isCur = cm.id === S.model;
+    const card  = document.createElement('div');
+    card.className = 'mm-card' + (isCur ? ' cur' : '');
+    const shortName = cm.file.replace(/\.gguf$/i,'');
+    card.innerHTML = `
+      <div class="mm-icon-wrap">
+        <svg class="mm-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V6l-4-4z"/>
+          <path d="M14 2v4h4M8 13h4M8 10h4M8 7h2"/>
+        </svg>
+      </div>
+      <div class="mm-info">
+        <div class="mm-name">${shortName}</div>
+        <div class="mm-desc">${cm.file}</div>
+        <div class="mm-meta"><span class="mm-badge custom">CUSTOM</span></div>
+      </div>
+      <div class="mm-actions">
+        <div class="mm-status">
+          <div class="mm-st-dot installed"></div>
+          <span class="mm-st-txt">READY</span>
+        </div>
+        ${isCur
+          ? `<button class="mm-btn active">ACTIVE</button>`
+          : `<button class="mm-btn select" onclick="selectModel('${cm.id}',event)">SELECT</button>`
+        }
+      </div>`;
+    if (!isCur) card.addEventListener('click', e => { if(e.target.tagName==='BUTTON') return; selectModel(cm.id, e); });
+    c.appendChild(card);
+  });
+
+  // "Add custom model" card
+  const addCard = document.createElement('div');
+  addCard.className = 'mm-card custom-add';
+  addCard.innerHTML = `<svg viewBox="0 0 16 16"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg> Add custom GGUF model`;
+  addCard.title = 'Opens the models folder — paste any .gguf file here';
+  addCard.addEventListener('click', async () => {
+    await window.jane.openModelsFolder();
+    setTimeout(() => renderMM(), 3000); // re-scan after user pastes file
+  });
+  c.appendChild(addCard);
+}
+
+function renderMM() { loadInstalledModels().then(() => buildMM()); }
+
+function openMM() {
+  renderMM();
+  // Check if llama-server exists
+  window.jane.checkDeps('cpu').then(r => updateLlamaBanner(r.llama)).catch(()=>{});
+  document.getElementById('model-modal').classList.add('open');
+}
+function closeMM() { document.getElementById('model-modal').classList.remove('open'); }
+
+function selectModel(id, ev) {
+  ev.stopPropagation();
+  setModel(id);
+  closeMM();
+}
+
+async function pullMM(id, ev) {
+  ev.stopPropagation();
+  closeMM();
+  const m = MODELS.find(x => x.id === id);
+  showPullScene('PULLING MODEL', `Downloading ${m?.label || id} — ${m?.size || '?'}`);
+  setSb(`Downloading ${id}…`, S.connected);
+  window.jane.pullModel(id);
+}
+
+function setModel(m) {
+  S.model = m;
+  document.getElementById('m-name').textContent = m.startsWith('custom:') ? m.replace('custom:','') : m;
+  window.jane.setModel(m);
+  buildMM();
+}
+
+window.jane.on('ollama:pull:progress', d => {
+  updatePullScene(d.pct || 0, d.label || null);
+});
+
+window.jane.on('ollama:pull:done', d => {
+  hidePullScene();
+  if (d.success) { setModel(d.model); setSb(`${d.model} ready ✓`, S.connected); renderMM(); }
+  else setSb(`Download failed: ${d.model} — ${d.error || 'check logs'}`, S.connected);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeMM(); document.getElementById('aov').classList.remove('show'); hidePullScene(); }
+});
+
+
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+async function init() {
+  await loadInstalledModels();
+  buildMM();
+  await loadPersonalization();
+  setTimeout(loadVoices, 3000);
+  buildQuickApps();
+  await loadHistory();
+  const info=await window.jane.activationInfo().catch(()=>null);
+  if(info?.activated){
+    const l=info.license;
+    document.getElementById('lk').textContent=l?.key||'—';
+    document.getElementById('ld').textContent=info.hostname||'—';
+    document.getElementById('la').textContent=l?.activatedAt?new Date(l.activatedAt).toLocaleDateString():'—';
+  }
+  // Populate hardware badges in settings
+  loadHardwareBadges();
+  loadAutomationPrefs();
+  document.getElementById('msg-in').focus();
+}
+
+async function loadHardwareBadges() {
+  try {
+    const prefs = await window.jane.getPrefs();
+    const gpuLabels = { nvidia:'NVIDIA · CUDA', amd:'AMD · Vulkan', intel:'Intel · Vulkan', cpu:'CPU · AVX2' };
+    const gpuEl = document.getElementById('hw-gpu-badge');
+    const thrEl = document.getElementById('hw-threads-badge');
+    if (gpuEl) gpuEl.textContent = gpuLabels[prefs.gpu] || 'Not configured';
+    if (thrEl) thrEl.textContent = prefs.threads ? `${prefs.threads} threads` : 'Auto';
+  } catch {}
+}
+
+function openHardwareSetup() {
+  window.jane.openHardwareSetup();
+  // Reload badges when settings window regains focus (after onboarding closes)
+  window.addEventListener('focus', () => loadHardwareBadges(), { once: true });
+}
+
+
+
+// ══════════════════════════════════════════════════════════
+//  PANEL SWITCH
+// ══════════════════════════════════════════════════════════
+function sw(id,btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if(btn) btn.classList.add('on');
+  if(id==='p-history') renderHistory();
+}
+
+// ══════════════════════════════════════════════════════════
+//  CHAT
+// ══════════════════════════════════════════════════════════
+function showMsgs() {
+  const w=document.getElementById('welcome'),m=document.getElementById('msgs');
+  if(w.style.display!=='none'){w.style.display='none';m.style.display='flex';}
+  if(!currentChatId) { currentChatId='c'+Date.now(); currentMessages=[]; }
+}
+
+function addUser(txt, imgB64) {
+  showMsgs();
+  const el = document.createElement('div');
+  el.className = 'mr user';
+  const imgHtml = imgB64
+    ? `<div style="margin-bottom:5px"><img src="${imgB64}" style="max-height:120px;max-width:240px;border-radius:8px;border:1px solid var(--b2);display:block;margin-left:auto" alt="attached"/></div>`
+    : '';
+  el.innerHTML = `<span class="mts">${ts()}</span>
+    <div class="bub" style="display:flex;flex-direction:column;gap:0">${imgHtml}${txt ? `<span>${esc(txt)}</span>` : ''}</div>
+    <div class="av user"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="5" r="3"/><path d="M2 15a6 6 0 0112 0"/></svg></div>`;
+  ms().appendChild(el);
+  currentMessages.push({ role:'user', text: txt, time: Date.now() });
+  scrollB();
+}
+
+function addJane(txt,err=false) {
+  showMsgs();
+  const el=document.createElement('div'); el.className='mr jane'+(err?' err':'');
+  const rendered = err ? esc(txt) : linkify(fmt(txt));
+  el.innerHTML=`<div class="av jane"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:#6d41be"><path d="M4 6h10v4h-4v4h4v4h-4v4h4v4h-10v-20zM22 6v4h-4v4h4v4h-4v4h4v4h6v-20h-6z"/></svg></div>
+   <div class="bub-wrap" style="position:relative">
+     <div class="bub">${rendered}</div>
+     <button class="copy-btn" title="Copy" onclick="copyBub(this)" style="display:none">
+       <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5"/></svg>
+     </button>
+   </div>
+   <span class="mts">${ts()}</span>`;
+  // Show copy button on hover via JS (more reliable than CSS in Electron)
+  const wrap = el.querySelector('.bub-wrap');
+  const copyBtn = el.querySelector('.copy-btn');
+  wrap.addEventListener('mouseenter', () => copyBtn.style.display = 'flex');
+  wrap.addEventListener('mouseleave', () => { if (!copyBtn.classList.contains('copied')) copyBtn.style.display = 'none'; });
+  ms().appendChild(el);
+  currentMessages.push({role:'jane',text:txt,time:Date.now()});
+  scrollB();
+}
+
+function copyBub(btn) {
+  const bub = btn.closest('.bub-wrap').querySelector('.bub');
+  navigator.clipboard.writeText(bub.innerText || bub.textContent).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M2 8l4 4 8-8"/></svg>';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.style.display = 'none';
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5"/></svg>';
+    }, 1800);
+  });
+}
+
+function linkify(html) {
+  return html.replace(/(https?:\/\/[^\s<>"')\]]+)/g,
+    '<a href="#" data-url="$1" onclick="window.jane.openExternal(this.dataset.url);return false;" style="color:#a78bfa;text-decoration:underline;text-decoration-color:rgba(167,139,250,.35);cursor:pointer;word-break:break-all">$1</a>');
+}
+
+
+const _cards=new Map();
+function addTC(id,tool,params) {
+  const ico=TOOL_ICONS[tool]||DI;
+  const ps=JSON.stringify(params,null,2);
+  const el=document.createElement('div'); el.className='tc'; el.id=`tc-${id}`;
+  el.innerHTML=`<div class="tc-h" onclick="tcToggle('${id}')">${ico}<span class="tc-name">${esc(tool)}</span><span class="tc-st"><span class="spn"></span> Running</span><span class="tc-ch">▾</span></div><div class="tc-b"><div class="tc-s"><div class="tc-lbl">Parameters</div><div class="tc-pre">${esc(ps)}</div></div></div>`;
+  ms().appendChild(el); _cards.set(id,el); scrollB();
+}
+function updateTC(id,result,success) {
+  const el=_cards.get(id); if(!el) return;
+  el.classList.add(success?'ok':'fail');
+  el.querySelector('.tc-st').innerHTML=success
+    ?`<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg>`
+    :`<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>`;
+  const rs=typeof result==='object'?JSON.stringify(result,null,2):String(result);
+  const sec=document.createElement('div'); sec.className='tc-s';
+  sec.innerHTML=`<div class="tc-lbl">Result</div><div class="tc-pre">${esc(rs.slice(0,1800)+(rs.length>1800?'\n…':''))}</div>`;
+  el.querySelector('.tc-b').appendChild(sec); scrollB();
+}
+function tcToggle(id){document.getElementById(`tc-${id}`)?.classList.toggle('open');}
+
+let _thk=null;
+function showThk(step,max){
+  hideThk(); _thk=document.createElement('div'); _thk.className='thk';
+  _thk.innerHTML=`<div class="av jane"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;fill:#6d41be"><path d="M4 6h10v4h-4v4h4v4h-4v4h4v4h-10v-20zM22 6v4h-4v4h4v4h-4v4h4v4h6v-20h-6z"/></svg></div><div class="thk-dots"><span></span><span></span><span></span></div><span class="thk-lbl">step ${step}/${max}</span>`;
+  ms().appendChild(_thk); scrollB();
+}
+function hideThk(){if(_thk){_thk.remove();_thk=null;}}
+function showWave(){document.getElementById('tb-wave').classList.add('on');}
+function hideWave(){document.getElementById('tb-wave').classList.remove('on');}
+
+// ══════════════════════════════════════════════════════════
+//  CHAT HISTORY — AI-named titles + AES-256 encrypted storage
+// ══════════════════════════════════════════════════════════
+async function saveCurrentChat() {
+  if(!currentChatId||currentMessages.length<2) return;
+  const userMsg=currentMessages.find(m=>m.role==='user');
+  if(!userMsg) return;
+
+  // Try AI-generated title first
+  let title=userMsg.text.length>50?userMsg.text.slice(0,50)+'…':userMsg.text;
+  try {
+    const aiTitle=await window.jane.generateTitle(currentMessages);
+    if(aiTitle&&aiTitle.trim().length>2) title=aiTitle.trim().slice(0,60);
+  } catch {}
+
+  const janeMsg=currentMessages.find(m=>m.role==='jane');
+  const preview=janeMsg?(janeMsg.text.slice(0,80)+'…'):'';
+  const existing=chatHistory.findIndex(c=>c.id===currentChatId);
+  const entry={
+    id:currentChatId, title, preview,
+    messages:[...currentMessages],
+    model:S.model,
+    createdAt:currentMessages[0]?.time||Date.now(),
+    updatedAt:Date.now(),
+    msgCount:currentMessages.filter(m=>m.role==='user').length,
+  };
+  if(existing>=0) chatHistory[existing]=entry;
+  else chatHistory.unshift(entry);
+  if(chatHistory.length>100) chatHistory.length=100;
+
+  // Save encrypted via IPC
+  try {
+    await window.jane.saveHistory(chatHistory);
+  } catch {
+    // Fallback to in-memory only
+  }
+}
+
+async function loadHistory() {
+  try {
+    const data = await window.jane.loadHistory();
+    if(data && Array.isArray(data)) chatHistory = data;
+    else chatHistory = [];
+  } catch { chatHistory = []; }
+}
+
+function renderHistory(filter='') {
+  const list=document.getElementById('hist-list');
+  const empty=document.getElementById('hist-empty');
+  let items=chatHistory;
+  if(filter) items=items.filter(c=>c.title.toLowerCase().includes(filter.toLowerCase())||c.preview.toLowerCase().includes(filter.toLowerCase()));
+  list.innerHTML='';
+  list.appendChild(empty);
+  if(items.length===0){empty.style.display='flex';return;}
+  empty.style.display='none';
+  const groups={};
+  items.forEach(c=>{
+    const d=new Date(c.createdAt), now=new Date();
+    let label='Older';
+    if(d.toDateString()===now.toDateString()) label='Today';
+    else {const y=new Date(now);y.setDate(y.getDate()-1);if(d.toDateString()===y.toDateString())label='Yesterday';}
+    if(!groups[label]) groups[label]=[];
+    groups[label].push(c);
+  });
+  ['Today','Yesterday','Older'].forEach(g=>{
+    if(!groups[g]) return;
+    const gh=document.createElement('div'); gh.className='h-date-group'; gh.textContent=g;
+    list.appendChild(gh);
+    groups[g].forEach(c=>{
+      const el=document.createElement('div');
+      el.className='hi'+(c.id===currentChatId?' active':'');
+      el.innerHTML=`
+        <div class="hi-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13a2 2 0 01-2 2H6l-4 3V5a2 2 0 012-2h12a2 2 0 012 2z"/></svg></div>
+        <div class="hi-body">
+          <div class="hi-title">${esc(c.title)}</div>
+          <div class="hi-preview">${esc(c.preview)}</div>
+          <div class="hi-meta">
+            <span class="hi-time">${new Date(c.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+            <span class="hi-count">${c.msgCount}&#8202;msgs</span>
+          </div>
+        </div>
+        <button class="hi-del" onclick="deleteChat('${c.id}',event)">
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>
+        </button>`;
+      el.onclick=()=>loadChat(c.id);
+      list.appendChild(el);
+    });
+  });
+}
+function filterHistory(q){renderHistory(q);}
+
+function loadChat(id) {
+  const chat=chatHistory.find(c=>c.id===id); if(!chat) return;
+  sw('p-chat',document.querySelector('[data-p="p-chat"]'));
+  const msgEl=document.getElementById('msgs'), welcome=document.getElementById('welcome');
+  welcome.style.display='none'; msgEl.style.display='flex'; msgEl.innerHTML='';
+  _cards.clear(); currentChatId=chat.id; currentMessages=[...chat.messages];
+  chat.messages.forEach(m=>{
+    if(m.role==='user'){
+      const el=document.createElement('div'); el.className='mr user';
+      el.innerHTML=`<span class="mts">${new Date(m.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span><div class="bub">${esc(m.text)}</div><div class="av user"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="5" r="3"/><path d="M2 15a6 6 0 0112 0"/></svg></div>`;
+      msgEl.appendChild(el);
+    } else if(m.role==='jane'){
+      const el=document.createElement('div'); el.className='mr jane';
+      el.innerHTML=`<div class="av jane"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;fill:#6d41be"><path d="M4 6h10v4h-4v4h4v4h-4v4h4v4h-10v-20zM22 6v4h-4v4h4v4h-4v4h4v4h6v-20h-6z"/></svg></div><div class="bub">${fmt(m.text)}</div><span class="mts">${new Date(m.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>`;
+      msgEl.appendChild(el);
+    }
+  });
+  scrollB(); setSb('Loaded: '+chat.title,S.connected);
+}
+function deleteChat(id,ev){
+  ev.stopPropagation();
+  chatHistory=chatHistory.filter(c=>c.id!==id);
+  window.jane.saveHistory(chatHistory).catch(()=>{});
+  renderHistory(document.getElementById('hs-in').value);
+}
+function clearAllHistory(){
+  if(!confirm('Clear all chat history?')) return;
+  chatHistory=[];
+  window.jane.saveHistory([]).catch(()=>{});
+  renderHistory();
+}
+
+// ══════════════════════════════════════════════════════════
+//  INPUT
+// ══════════════════════════════════════════════════════════
+function sendMsg() {
+  const inp=document.getElementById('msg-in'), txt=inp.value.trim();
+  if(!txt||S.busy) return;
+  inp.value=''; autoR(inp);
+  if(!S.connected && _apiMode==='local'){setSb('VRE not connected',false);return;}
+  sw('p-chat',document.querySelector('[data-p="p-chat"]'));
+
+  let augmented = txt;
+  if (thinkExtended) augmented = '[THINK_EXTENDED] ' + augmented;
+  const imgForDisplay = pendingImageB64; // capture before clearImg
+  if (pendingImageB64) {
+    augmented = '[IMAGE_ATTACHED]' + pendingImageB64 + '[/IMAGE_ATTACHED]\n' + augmented;
+    clearImg();
+  }
+
+  addUser(txt, imgForDisplay); S.busy=true; setInp(false);
+
+  // Cloud API path
+  if (_apiMode !== 'local') {
+    sendViaCloudApi(txt).finally(() => { S.busy=false; setInp(true); });
+    return;
+  }
+
+  setSb('Jane is thinking…',S.connected);
+  window.jane.sendMessage(augmented, S.model);
+}
+
+async function sendViaCloudApi(txt) {
+  showMsgs(); showThk(1,1);
+  const providerName = _apiMode === 'openai' ? 'OpenAI' : 'Gemini';
+  setSb(`Sending to ${providerName}…`, true);
+  try {
+    const prefs    = await window.jane.getPrefs();
+    const key      = prefs[`${_apiMode}_api_key`] || '';
+    const model    = prefs[`${_apiMode}_api_model`] || (_apiMode === 'openai' ? 'gpt-4o-mini' : 'gemini-1.5-flash');
+    if (!key) {
+      hideThk();
+      addJane('⚠ No API key configured. Go to Automation → Configure API.', true);
+      return;
+    }
+    const sysMsg  = { role: 'system', content: `You are ${P?.aiName||'Jane'}, a helpful AI assistant. The user's name is ${P?.userName||'User'}.` };
+    const history = (currentMessages||[]).slice(-10).map(m => ({
+      role: m.role === 'jane' ? 'assistant' : 'user', content: m.text
+    }));
+    const messages = [sysMsg, ...history, { role: 'user', content: txt }];
+    const result   = await window.jane.cloudApiCall(_apiMode, key, model, messages);
+    hideThk();
+    if (result.error) { addJane(`⚠ ${providerName} error: ${result.error}`, true); return; }
+    addJane(result.content || '(empty response)');
+    setSb(`${providerName} · ${model}`, true);
+  } catch(e) {
+    hideThk();
+    addJane('⚠ Cloud API call failed: ' + e.message, true);
+    setSb('API error', true);
+  }
+}
+function chip(el){document.getElementById('msg-in').value=el.textContent.trim();sendMsg();}
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}
+  document.getElementById('send-btn').disabled=!document.getElementById('msg-in').value.trim()||S.busy;
+}
+function autoR(el){
+  el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px';
+  document.getElementById('send-btn').disabled=!el.value.trim()||S.busy;
+}
+function setInp(on){
+  document.getElementById('msg-in').disabled=!on;
+  document.getElementById('send-btn').disabled=!on;
+  if(on) document.getElementById('msg-in').focus();
+}
+
+// ══════════════════════════════════════════════════════════
+//  VOICE
+// ══════════════════════════════════════════════════════════
+function toggleVoice(){S.ttsOn=!S.ttsOn;document.getElementById('voice-ib').classList.toggle('on',S.ttsOn);document.getElementById('tts-t').classList.toggle('on',S.ttsOn);applyVoice();}
+function toggleTTS(){S.ttsOn=!S.ttsOn;document.getElementById('tts-t').classList.toggle('on',S.ttsOn);document.getElementById('voice-ib').classList.toggle('on',S.ttsOn);applyVoice();}
+function toggleSTT(){S.sttOn=!S.sttOn;document.getElementById('stt-t').classList.toggle('on',S.sttOn);applyVoice();}
+function toggleWake(){S.wakeOn=!S.wakeOn;document.getElementById('wake-t').classList.toggle('on',S.wakeOn);window.jane.toggleIsland(S.wakeOn);}
+function toggleWhisper(){S.whisperOn=!S.whisperOn;document.getElementById('whisper-t').classList.toggle('on',S.whisperOn);setSb(S.whisperOn?'Whisper NLP enabled — better voice recognition':'Using Windows SAPI',S.connected);}
+function togglePerf(){S.perfHigh=!S.perfHigh;document.getElementById('perf-t').classList.toggle('on',S.perfHigh);setSb(S.perfHigh?'Performance mode: 60% CPU/GPU — restart Jane to apply':'Performance mode: 30% CPU/GPU — restart Jane to apply',S.connected);}
+
+// ── Think Extended ─────────────────────────────────────────
+let thinkExtended = false;
+function toggleThinkExtended() {
+  thinkExtended = !thinkExtended;
+  document.getElementById('think-t')?.classList.toggle('on', thinkExtended);
+  renderModeBadges();
+  window.jane.setPrefs({ thinkExtended });
+  setSb(thinkExtended ? 'Think Extended ON — deeper reasoning, slower responses' : 'Think Extended OFF', S.connected);
+}
+
+// ── Recall Mode ────────────────────────────────────────────
+let recallMode = false;
+function toggleRecall() {
+  recallMode = !recallMode;
+  document.getElementById('recall-t')?.classList.toggle('on', recallMode);
+  renderModeBadges();
+  window.jane.setPrefs({ recallMode });
+  setSb(recallMode ? 'Recall ON — Jane will review history for context' : 'Recall OFF', S.connected);
+}
+
+// ── Lewd Mode ──────────────────────────────────────────────
+let lewdMode = false;
+function toggleLewd() {
+  lewdMode = !lewdMode;
+  document.getElementById('lewd-t')?.classList.toggle('on', lewdMode);
+  window.jane.setPrefs({ lewdMode }).then(() => {
+    // Reset chat so the new system prompt takes effect immediately
+    window.jane.resetChat();
+    if (lewdMode) {
+      setSb('Lewd Mode enabled 🔞 — Jane is now in girlfriend mode. Chat reset.', S.connected);
+    } else {
+      setSb('Lewd Mode disabled — Jane back to normal. Chat reset.', S.connected);
+    }
+    // Clear chat history UI
+    const msgs = document.getElementById('msgs');
+    if (msgs) { msgs.innerHTML = ''; msgs.style.display = 'none'; }
+    const welcome = document.getElementById('welcome');
+    if (welcome) welcome.style.display = '';
+  });
+}
+
+// ── Auto-Tune with stress test ─────────────────────────────
+let autoTune = false;
+function toggleAutoTune() {
+  autoTune = !autoTune;
+  document.getElementById('tune-t')?.classList.toggle('on', autoTune);
+  if (autoTune) runAutoTune();
+  window.jane.setPrefs({ autoTune });
+}
+
+async function runAutoTune() {
+  const btn    = document.getElementById('tune-run-btn');
+  const prog   = document.getElementById('tune-progress');
+  const bar    = document.getElementById('tune-prog-bar');
+  const txt    = document.getElementById('tune-prog-txt');
+  const params = document.getElementById('tune-params');
+  const sub    = document.getElementById('tune-run-sub');
+
+  if (btn) { btn.disabled = true; btn.textContent = 'TESTING…'; }
+  if (prog) prog.style.display = 'block';
+
+  function setP(pct, msg) {
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = msg;
+  }
+
+  try {
+    setP(5, 'Reading hardware specs…');
+    const info = await window.jane.getCpuInfo().catch(() => ({}));
+    const prefs = await window.jane.getPrefs().catch(() => ({}));
+
+    setP(20, 'Running CPU stress test…');
+    const cpuScore = await stressTestCPU();
+
+    setP(50, 'Measuring memory bandwidth…');
+    const memScore = await stressTestMemory();
+
+    setP(75, 'Computing optimal parameters…');
+    await sleep(300);
+
+    const ramGB   = info.ramGB   || 8;
+    const threads = info.threads || 4;
+    const gpu     = prefs.gpu    || 'cpu';
+
+    // Smart allocation based on real scores
+    const hasGpu      = gpu !== 'cpu';
+    const ramFactor   = Math.min(1, ramGB / 16);
+    const cpuFactor   = Math.min(1, cpuScore / 1000);
+
+    const ctxSize = hasGpu
+      ? (ramGB >= 32 ? 16384 : ramGB >= 16 ? 8192 : 4096)
+      : Math.round(2048 + cpuFactor * 2048);
+
+    const maxTok  = hasGpu
+      ? (cpuScore > 800 ? 2000 : 1500)
+      : Math.round(400 + cpuFactor * 600);
+
+    const batch   = hasGpu
+      ? (memScore > 800 ? 1024 : 512)
+      : Math.round(128 + memScore * 1.5);
+
+    const thrLim  = hasGpu
+      ? Math.min(4, Math.floor(threads / 2))
+      : Math.min(threads - 1, Math.max(2, Math.floor(threads * 0.65)));
+
+    setP(90, 'Applying settings…');
+    await sleep(200);
+
+    // Update UI tiles
+    const el = id => document.getElementById(id);
+    if (el('tune-ctx')) el('tune-ctx').textContent = ctxSize.toLocaleString();
+    if (el('tune-tok')) el('tune-tok').textContent = maxTok;
+    if (el('tune-bat')) el('tune-bat').textContent = batch;
+    if (el('tune-thr')) el('tune-thr').textContent = thrLim;
+    if (params)         params.style.display = 'block';
+
+    // Show score
+    const scoreRow = document.getElementById('tune-score-row');
+    const scoreEl  = document.getElementById('tune-score');
+    const grade = cpuScore > 900 ? '🟢 Excellent' : cpuScore > 600 ? '🟡 Good' : '🔴 Limited';
+    if (scoreEl) scoreEl.textContent = `CPU: ${cpuScore} pts  •  MEM: ${memScore} pts  •  ${grade}`;
+    if (scoreRow) scoreRow.style.display = 'block';
+
+    // Pre-fill OC sliders with tuned values
+    const setSlider = (id, val) => {
+      const s = document.getElementById(id);
+      if (s) { s.value = val; s.dispatchEvent(new Event('input')); }
+    };
+    setSlider('oc-gpu', hasGpu ? 99 : 0);
+    setSlider('oc-ctx', ctxSize);
+    setSlider('oc-bat', batch);
+    setSlider('oc-thr', thrLim);
+
+    await window.jane.setPrefs({ tuneCtx: ctxSize, tuneTok: maxTok, tuneBatch: batch, tuneThr: thrLim });
+
+    setP(100, `Done — ctx:${ctxSize} tok:${maxTok} batch:${batch} thr:${thrLim}`);
+    if (sub) sub.textContent = `Last tuned: ctx ${ctxSize}, tokens ${maxTok}`;
+    setSb(`Auto-Tuned ✓  ctx=${ctxSize}  tokens=${maxTok}  batch=${batch}  threads=${thrLim}`, S.connected);
+
+  } catch(e) {
+    setP(0, 'Tuning failed: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'RUN TEST →'; }
+    setTimeout(() => { if (prog) prog.style.display = 'none'; }, 3000);
+  }
+}
+
+// ── Micro benchmark helpers ────────────────────────────────
+function stressTestCPU() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const t0 = performance.now();
+      let x = 0;
+      for (let i = 0; i < 5_000_000; i++) { x += Math.sqrt(i) * Math.sin(i); }
+      const ms = performance.now() - t0;
+      // Lower ms = faster CPU → higher score (cap at 1000)
+      resolve(Math.min(1000, Math.round(8000 / ms * 100)));
+    }, 50);
+  });
+}
+
+function stressTestMemory() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const t0 = performance.now();
+      const arr = new Float64Array(500_000);
+      for (let i = 0; i < arr.length; i++) arr[i] = i * 1.000001;
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) sum += arr[i];
+      const ms = performance.now() - t0;
+      resolve(Math.min(1000, Math.round(3000 / ms * 100)));
+    }, 50);
+  });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Manual Overclock ───────────────────────────────────────
+function showOCWarning() {
+  document.getElementById('oc-modal').classList.add('show');
+}
+
+function confirmOC() {
+  document.getElementById('oc-modal').classList.remove('show');
+  const panel = document.getElementById('oc-panel');
+  if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'block';
+}
+
+async function applyOC() {
+  const gpu = parseInt(document.getElementById('oc-gpu')?.value || 99);
+  const ctx = parseInt(document.getElementById('oc-ctx')?.value || 4096);
+  const bat = parseInt(document.getElementById('oc-bat')?.value || 512);
+  const thr = parseInt(document.getElementById('oc-thr')?.value || 4);
+  await window.jane.setPrefs({ tuneCtx: ctx, tuneBatch: bat, tuneThr: thr, ocGpuLayers: gpu, manualOC: true });
+  setSb(`⚡ OC Applied — gpu_layers:${gpu}  ctx:${ctx}  batch:${bat}  threads:${thr}  (restart model to take effect)`, S.connected);
+}
+
+// ── Drag & Drop ────────────────────────────────────────────
+(function initDragDrop() {
+  const overlay = document.getElementById('dd-overlay');
+  let dragCount = 0;
+
+  document.addEventListener('dragenter', e => {
+    if (!e.dataTransfer?.types?.includes('Files')) return;
+    dragCount++;
+    if (dragCount === 1) overlay.classList.add('show');
+  });
+
+  document.addEventListener('dragleave', e => {
+    dragCount = Math.max(0, dragCount - 1);
+    if (dragCount === 0) overlay.classList.remove('show');
+  });
+
+  document.addEventListener('dragover', e => { e.preventDefault(); });
+
+  document.addEventListener('drop', e => {
+    e.preventDefault();
+    dragCount = 0;
+    overlay.classList.remove('show');
+    const files = Array.from(e.dataTransfer?.files || []);
+    if (!files.length) return;
+    handleDroppedFiles(files);
+  });
+})();
+
+async function handleDroppedFiles(files) {
+  for (const file of files) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    // Image → feed to LLaVA vision
+    if (/^(png|jpg|jpeg|gif|webp|bmp)$/.test(ext)) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        pendingImageB64 = ev.target.result;
+        const thumb = document.getElementById('img-thumb');
+        const wrap  = document.getElementById('img-preview-wrap');
+        if (thumb) thumb.src = pendingImageB64;
+        if (wrap)  wrap.style.display = 'block';
+        document.getElementById('img-ib')?.classList.add('on');
+        setSb(`📎 Image attached: ${file.name} — send a message to analyze`, S.connected);
+      };
+      reader.readAsDataURL(file);
+    }
+    // Text / PDF / code → read and insert into message box
+    else if (/^(txt|md|js|ts|py|json|csv|html|css|xml|log|sh|bat|pdf)$/.test(ext)) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const content = ev.target.result;
+        const msgIn = document.getElementById('msg-in');
+        if (msgIn) {
+          const prefix = `[File: ${file.name}]\n\`\`\`\n`;
+          const suffix = '\n```\n';
+          const existing = msgIn.value;
+          msgIn.value = existing + (existing ? '\n' : '') + prefix + content.slice(0, 8000) + (content.length > 8000 ? '\n…(truncated)' : '') + suffix;
+          autoR(msgIn);
+          document.getElementById('send-btn').disabled = false;
+          msgIn.focus();
+          setSb(`📎 File attached: ${file.name}`, S.connected);
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      setSb(`⚠ Unsupported file type: .${ext}`, S.connected);
+    }
+  }
+}
+
+
+// ── Mode badges in input area ──────────────────────────────
+function renderModeBadges() {
+  const el = document.getElementById('mode-badges');
+  if (!el) return;
+  el.innerHTML = '';
+  const addBadge = (id, label, svg, active, fn) => {
+    const b = document.createElement('div');
+    b.className = 'mode-badge' + (active ? ' active' : '');
+    b.id = 'mbadge-' + id;
+    b.innerHTML = svg + label;
+    b.onclick = fn;
+    el.appendChild(b);
+  };
+  const svgThink = `<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M5.5 9.5c0-1.4 1-2.5 2.5-2.5s2.5 1.1 2.5 2.5"/><circle cx="8" cy="12" r=".5" fill="currentColor"/></svg>`;
+  const svgRecall = `<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 8a6 6 0 1 0 12 0A6 6 0 0 0 2 8z"/><path d="M8 5v3l2 2"/></svg>`;
+  addBadge('think', ' THINK EXTENDED', svgThink, thinkExtended, toggleThinkExtended);
+  addBadge('recall', ' RECALL', svgRecall, recallMode, toggleRecall);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUTOMATION PANEL
+// ═══════════════════════════════════════════════════════════
+
+// ── Cloud API mode ─────────────────────────────────────────
+let _apiMode = 'local', _apiProvider = null;
+
+function setApiMode(val) {
+  _apiMode = val;
+  const disc = document.getElementById('api-disclaimer');
+  if (disc) disc.style.display = (val !== 'local') ? 'block' : 'none';
+  window.jane.setPrefs({ apiMode: val });
+  if (val === 'local') {
+    setSb('🔒 Running fully local — no cloud', S.connected);
+    // restore model badge
+    if (S.model) { const el = document.getElementById('m-name'); if (el) el.textContent = S.model; }
+  } else {
+    window.jane.getPrefs().then(p => {
+      const model = p[`${val}_api_model`] || (val === 'openai' ? 'gpt-4o-mini' : 'gemini-1.5-flash');
+      setSb(`☁️ ${val === 'openai' ? 'OpenAI' : 'Gemini'} · ${model}`, true);
+      const el = document.getElementById('m-name');
+      if (el) el.textContent = val === 'openai' ? 'OpenAI' : 'Gemini';
+    }).catch(() => {});
+  }
+}
+
+function openApiSetup() {
+  const modal = document.getElementById('api-modal');
+  modal.style.display = 'flex';
+  document.getElementById('api-step-1').style.display = 'block';
+  document.getElementById('api-step-2').style.display = 'none';
+}
+
+function closeApiModal() {
+  document.getElementById('api-modal').style.display = 'none';
+}
+
+function selectApiProvider(provider) {
+  _apiProvider = provider;
+  document.querySelectorAll('.api-provider-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.api-provider-card[data-provider="${provider}"]`)?.classList.add('selected');
+  document.getElementById('api-step-1').style.display = 'none';
+  document.getElementById('api-step-2').style.display = 'block';
+
+  const lbl = document.getElementById('api-provider-lbl');
+  if (lbl) lbl.textContent = provider === 'openai' ? 'OPENAI API KEY (sk-...)' : 'GOOGLE AI API KEY';
+  document.getElementById('api-key-input').placeholder = provider === 'openai' ? 'sk-...' : 'AIza...';
+
+  // Swap model options
+  const sel = document.getElementById('api-model-sel');
+  if (sel) {
+    if (provider === 'openai') {
+      sel.innerHTML = `
+        <option value="gpt-4o-mini">GPT-4o mini — fast, affordable</option>
+        <option value="gpt-4o">GPT-4o — most capable</option>
+        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+        <option value="gpt-3.5-turbo">GPT-3.5 Turbo — cheapest</option>`;
+    } else {
+      sel.innerHTML = `
+        <option value="gemini-1.5-flash">Gemini 1.5 Flash — fast, free tier</option>
+        <option value="gemini-1.5-pro">Gemini 1.5 Pro — most capable</option>
+        <option value="gemini-2.0-flash">Gemini 2.0 Flash — latest</option>`;
+    }
+  }
+  document.getElementById('api-key-input').focus();
+}
+
+async function confirmApiKey() {
+  if (!document.getElementById('api-agree-cb').checked) {
+    document.getElementById('api-agree-cb').style.outline = '2px solid var(--red)';
+    setTimeout(() => document.getElementById('api-agree-cb').style.outline = '', 2000);
+    return;
+  }
+  const key   = document.getElementById('api-key-input').value.trim();
+  const model = document.getElementById('api-model-sel')?.value || (_apiProvider === 'openai' ? 'gpt-4o-mini' : 'gemini-1.5-flash');
+  if (!key) { document.getElementById('api-key-input').style.borderColor = 'var(--red)'; return; }
+  await window.jane.setPrefs({
+    [`${_apiProvider}_api_key`]:   key,
+    [`${_apiProvider}_api_model`]: model,
+    apiMode: _apiProvider
+  });
+  document.getElementById('api-mode').value = _apiProvider;
+  setApiMode(_apiProvider);
+  const statusTxt = document.getElementById('api-status-txt');
+  const providerName = _apiProvider === 'openai' ? 'OpenAI' : 'Gemini';
+  if (statusTxt) statusTxt.textContent = `${providerName} · ${model} configured ✓`;
+  closeApiModal();
+  setSb(`✓ ${providerName} (${model}) ready — Automation panel active`, S.connected);
+}
+
+// ── Device control ─────────────────────────────────────────
+let devControlEnabled = false;
+let devices = [];
+
+function toggleDevControl() {
+  devControlEnabled = !devControlEnabled;
+  document.getElementById('dev-ctrl-t')?.classList.toggle('on', devControlEnabled);
+  document.getElementById('dev-ctrl-panel').style.display = devControlEnabled ? 'block' : 'none';
+  window.jane.setPrefs({ devControlEnabled });
+  if (devControlEnabled) renderDevices();
+}
+
+function openAddDevice() {
+  const modal = document.getElementById('device-modal');
+  modal.style.display = 'flex';
+  ['dev-name','dev-host','dev-on','dev-off'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+}
+
+async function saveDevice() {
+  const name = document.getElementById('dev-name').value.trim();
+  const host = document.getElementById('dev-host').value.trim();
+  const type = document.getElementById('dev-type').value;
+  const onCmd = document.getElementById('dev-on').value.trim();
+  const offCmd = document.getElementById('dev-off').value.trim();
+  if (!name || !host) {
+    ['dev-name','dev-host'].forEach(id => { if (!document.getElementById(id).value.trim()) document.getElementById(id).style.borderColor = 'var(--red)'; });
+    return;
+  }
+  const device = { id: 'dev_' + Date.now(), name, host, type, onCmd, offCmd, enabled: true };
+  devices.push(device);
+  await window.jane.setPrefs({ devices });
+  document.getElementById('device-modal').style.display = 'none';
+  renderDevices();
+  setSb(`Device "${name}" added — say "turn on ${name}" to control it`, S.connected);
+}
+
+function renderDevices() {
+  const list = document.getElementById('device-list');
+  if (!list) return;
+  list.innerHTML = '';
+  devices.forEach((d, i) => {
+    const el = document.createElement('div');
+    el.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:8px';
+    el.innerHTML = `<div style="flex:1">
+      <div style="font-size:12px;font-weight:600;color:var(--t1)">${d.name}</div>
+      <div style="font-size:10px;font-family:var(--mono);color:var(--t3)">${d.type.toUpperCase()} · ${d.host}</div>
+    </div>
+    <button onclick="testDevice(${i})" style="font-family:var(--mono);font-size:9px;padding:4px 8px;border:1px solid var(--b2);background:transparent;color:var(--t3);border-radius:5px;cursor:pointer">TEST</button>
+    <button onclick="removeDevice(${i})" style="font-family:var(--mono);font-size:9px;padding:4px 8px;border:1px solid rgba(239,68,68,.2);background:transparent;color:var(--red);border-radius:5px;cursor:pointer">✕</button>`;
+    list.appendChild(el);
+  });
+}
+
+async function testDevice(idx) {
+  const d = devices[idx];
+  if (!d) return;
+  try {
+    if (d.type === 'http') {
+      const url = `http://${d.host}${d.onCmd}`;
+      const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      setSb(`✓ Device "${d.name}" responded: HTTP ${r.status}`, S.connected);
+    } else {
+      setSb(`Device test: ${d.type} support in progress`, S.connected);
+    }
+  } catch (e) {
+    setSb(`⚠ Device "${d.name}" unreachable: ${e.message}`, S.connected);
+  }
+}
+
+async function removeDevice(idx) {
+  devices.splice(idx, 1);
+  await window.jane.setPrefs({ devices });
+  renderDevices();
+}
+
+// ── Whisper auto-pull ──────────────────────────────────────
+async function checkWhisperStatus() {
+  try {
+    const prefs = await window.jane.getPrefs();
+    const el = document.getElementById('whisper-status-txt');
+    const badge = document.getElementById('whisper-status-badge');
+    if (prefs.whisperInstalled) {
+      if (el) el.textContent = 'Installed and ready ✓';
+      if (badge) { badge.textContent = 'INSTALLED'; badge.className = 'hw-badge hw-badge-acc'; }
+      document.getElementById('whisper-pull-btn')?.setAttribute('disabled', '');
+    } else {
+      if (el) el.textContent = 'Not installed — click INSTALL to auto-download';
+      if (badge) { badge.textContent = 'MISSING'; badge.className = 'hw-badge'; }
+    }
+  } catch {}
+}
+
+async function pullWhisper() {
+  const btn  = document.getElementById('whisper-pull-btn');
+  const prog = document.getElementById('whisper-pull-progress');
+  const bar  = document.getElementById('whisper-prog-bar');
+  const txt  = document.getElementById('whisper-prog-txt');
+  if (btn)  { btn.disabled = true; btn.textContent = 'INSTALLING…'; }
+  if (prog) prog.style.display = 'block';
+
+  // Listen for real progress events from main process
+  window.jane.onWhisperProgress?.(({ stage, pct }) => {
+    const stageLabel = stage === 'model' ? 'Downloading model' : stage === 'extract' ? 'Extracting' : 'Downloading binary';
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = `${stageLabel}… ${pct}%`;
+  });
+  window.jane.onWhisperDone?.(({ success }) => {
+    if (bar) bar.style.width = '100%';
+    if (txt) txt.textContent = success ? 'Installed successfully ✓' : 'Installation failed';
+    setTimeout(() => {
+      if (prog) prog.style.display = 'none';
+      if (btn)  { btn.disabled = false; btn.textContent = 'INSTALL →'; }
+      checkWhisperStatus();
+    }, 2000);
+  });
+  window.jane.onWhisperError?.(({ error }) => {
+    if (txt) txt.textContent = `Error: ${error}`;
+    if (btn) { btn.disabled = false; btn.textContent = 'RETRY →'; }
+    setSb('Whisper install failed: ' + error, S.connected);
+  });
+
+  // Trigger the actual download in main process
+  await window.jane.setPrefs({ whisperPullRequested: true });
+  if (txt) txt.textContent = 'Fetching release info…';
+  setSb('Downloading Whisper.cpp — this may take a few minutes', S.connected);
+}
+
+// ── Hotkey editor ──────────────────────────────────────────
+let _hkTarget = null;
+const _hkDefaults = { main: 'Alt+Space', float: 'Alt+J', screen: 'Alt+S' };
+const _hkCurrent  = { ..._hkDefaults };
+
+function editHotkey(name) {
+  if (_hkTarget) cancelHotkey(); // cancel previous
+  _hkTarget = name;
+  const badge = document.getElementById(`hk-${name}`);
+  if (badge) { badge.textContent = 'Press keys…'; badge.classList.add('recording'); }
+  const recDiv = document.getElementById('hk-recording');
+  if (recDiv) recDiv.style.display = 'block';
+  document.addEventListener('keydown', _captureHotkey, { once: false });
+}
+
+function cancelHotkey() {
+  if (!_hkTarget) return;
+  const badge = document.getElementById(`hk-${_hkTarget}`);
+  if (badge) { badge.textContent = _hkCurrent[_hkTarget]; badge.classList.remove('recording'); }
+  document.getElementById('hk-recording')?.style && (document.getElementById('hk-recording').style.display = 'none');
+  document.removeEventListener('keydown', _captureHotkey);
+  _hkTarget = null;
+}
+
+function _captureHotkey(e) {
+  e.preventDefault();
+  if (e.key === 'Escape') { cancelHotkey(); return; }
+  if (['Control','Alt','Shift','Meta'].includes(e.key)) return;
+  const parts = [];
+  if (e.ctrlKey)  parts.push('Ctrl');
+  if (e.altKey)   parts.push('Alt');
+  if (e.shiftKey) parts.push('Shift');
+  if (e.metaKey)  parts.push('Meta');
+  parts.push(e.key.length === 1 ? e.key.toUpperCase() : e.key);
+  const combo = parts.join('+');
+  _hkCurrent[_hkTarget] = combo;
+  const badge = document.getElementById(`hk-${_hkTarget}`);
+  if (badge) { badge.textContent = combo; badge.classList.remove('recording'); }
+  document.getElementById('hk-recording').style.display = 'none';
+  document.removeEventListener('keydown', _captureHotkey);
+  window.jane.setPrefs({ hotkeys: _hkCurrent });
+  window.jane.on && setSb(`Hotkey "${combo}" saved — restart Jane to apply`, S.connected);
+  _hkTarget = null;
+}
+
+// ── Chat export ────────────────────────────────────────────
+function exportChat(format) {
+  if (!currentMessages || currentMessages.length === 0) {
+    setSb('No messages to export', S.connected);
+    return;
+  }
+  const ts = new Date().toISOString().slice(0,10);
+  let content, filename, type;
+  if (format === 'md') {
+    const aiName = P?.aiName || 'Jane';
+    content = `# Jane Chat Export — ${ts}\n\n` + currentMessages.map(m => {
+      const role = m.role === 'jane' ? `**${aiName}**` : '**You**';
+      return `${role}: ${m.text}\n`;
+    }).join('\n');
+    filename = `jane-chat-${ts}.md`;
+    type = 'text/markdown';
+  } else {
+    content = JSON.stringify({ exported: ts, messages: currentMessages }, null, 2);
+    filename = `jane-chat-${ts}.json`;
+    type = 'application/json';
+  }
+  const blob = new Blob([content], { type });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  setSb(`Chat exported as ${filename}`, S.connected);
+}
+
+// ── Load automation prefs on init ─────────────────────────
+async function loadAutomationPrefs() {
+  try {
+    const p = await window.jane.getPrefs();
+    if (p.apiMode) { document.getElementById('api-mode').value = p.apiMode; _apiMode = p.apiMode; if (p.apiMode !== 'local') document.getElementById('api-disclaimer').style.display = 'block'; }
+    if (p.devControlEnabled) { devControlEnabled = true; document.getElementById('dev-ctrl-t')?.classList.add('on'); document.getElementById('dev-ctrl-panel').style.display = 'block'; }
+    if (p.devices) { devices = p.devices; renderDevices(); }
+    if (p.hotkeys) { Object.assign(_hkCurrent, p.hotkeys); Object.keys(_hkCurrent).forEach(k => { const b = document.getElementById(`hk-${k}`); if (b) b.textContent = _hkCurrent[k]; }); }
+    if (p.openai_api_key || p.gemini_api_key) {
+      const provider = p.openai_api_key ? 'openai' : 'gemini';
+      const el = document.getElementById('api-status-txt');
+      if (el) el.textContent = `${provider === 'openai' ? 'OpenAI' : 'Gemini'} key configured ✓`;
+    }
+  } catch {}
+  checkWhisperStatus();
+}
+
+// ── Font change ────────────────────────────────────────────
+function setFont(val) {
+  const uploadRow = document.getElementById('font-upload-row');
+  if (uploadRow) uploadRow.style.display = val === 'custom' ? 'flex' : 'none';
+  const fontMap = {
+    system: "-apple-system,'Segoe UI',system-ui,sans-serif",
+    mono:   "'SF Mono','Fira Code',ui-monospace,monospace",
+    serif:  "Georgia,'Times New Roman',serif",
+  };
+  if (val !== 'custom') {
+    document.body.style.fontFamily = fontMap[val] || fontMap.system;
+    window.jane.setPrefs({ uiFont: val });
+  }
+}
+
+function handleFontUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const face = new FontFace('CustomJaneFont', ev.target.result);
+    face.load().then(f => {
+      document.fonts.add(f);
+      document.body.style.fontFamily = "'CustomJaneFont', sans-serif";
+      document.getElementById('font-upload-name').textContent = '✓ ' + file.name;
+      setSb('Custom font "' + file.name + '" applied', S.connected);
+    }).catch(() => setSb('Failed to load font', S.connected));
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── Image upload for LLaVA ─────────────────────────────────
+let pendingImageB64 = null;
+
+function handleImgSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    pendingImageB64 = ev.target.result; // data:image/...;base64,...
+    const thumb = document.getElementById('img-thumb');
+    const wrap  = document.getElementById('img-preview-wrap');
+    if (thumb) thumb.src = pendingImageB64;
+    if (wrap)  wrap.style.display = 'block';
+    document.getElementById('img-ib').classList.add('on');
+    setSb('Image attached — send a message to analyze with LLaVA', S.connected);
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImg() {
+  pendingImageB64 = null;
+  const wrap  = document.getElementById('img-preview-wrap');
+  const thumb = document.getElementById('img-thumb');
+  const input = document.getElementById('img-file');
+  if (wrap)  wrap.style.display = 'none';
+  if (thumb) thumb.src = '';
+  if (input) input.value = '';
+  document.getElementById('img-ib').classList.remove('on');
+}
+
+// ── Click ripple effect ────────────────────────────────────
+function addRipple(e, el) {
+  const r = document.createElement('span');
+  const rect = el.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.className = 'ripple';
+  r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+  el.appendChild(r);
+  setTimeout(() => r.remove(), 450);
+}
+document.querySelectorAll('.gc,.tcard,.chip,.ni,.btn-back,.btn-next').forEach(el => {
+  el.classList.add('ripple-host');
+  el.addEventListener('click', e => addRipple(e, el));
+});
+
+
+function setVoice(v){S.voiceName=v;applyVoice();}
+function applyVoice(){window.jane.setVoiceConfig({tts_enabled:S.ttsOn,stt_enabled:S.sttOn,voice_name:S.voiceName});}
+
+async function loadVoices(){
+  const {voices}=await window.jane.listVoices().catch(()=>({voices:[]}));
+  const sel=document.getElementById('v-sel'); sel.innerHTML='<option value="">Default</option>';
+  let ff='';
+  voices.forEach(v=>{
+    const opt=document.createElement('option'); opt.value=v; opt.textContent=v;
+    if(!ff&&/zira|aria|hazel|cortana|female|sonia|natasha/i.test(v)) ff=v;
+    sel.appendChild(opt);
+  });
+  if(ff){S.voiceName=ff;sel.value=ff;applyVoice();}
+}
+
+function startListen(){
+  if(!S.sttOn){setSb('Enable Microphone in Settings first',S.connected);return;}
+  document.getElementById('mic-ib').classList.add('listening');
+  setSb('Listening… speak now',S.connected);
+  window.jane.startListening();
+  setTimeout(()=>document.getElementById('mic-ib').classList.remove('listening'),12000);
+}
+
+// ══════════════════════════════════════════════════════════
+//  VOICE SESSION (Jarvis-style continuous)
+// ══════════════════════════════════════════════════════════
+function vsStatus(txt){ document.getElementById('vs-status').textContent=txt; }
+function vsTranscript(txt){ document.getElementById('vs-transcript').textContent=txt; }
+
+function toggleVoiceSession(){
+  S.voiceSessionOn=!S.voiceSessionOn;
+  const btn=document.getElementById('vs-toggle');
+  const orb=document.getElementById('vs-orb');
+  if(S.voiceSessionOn){
+    orb.classList.add('active'); btn.classList.add('active'); btn.textContent='END SESSION';
+    if(!S.ttsOn){S.ttsOn=true;document.getElementById('tts-t').classList.add('on');applyVoice();}
+    if(!S.sttOn){S.sttOn=true;document.getElementById('stt-t').classList.add('on');applyVoice();}
+    vsStatus('Voice session active — say something');
+    vsTranscript('Listening…');
+    setTimeout(vsListen,600);
+  } else {
+    orb.classList.remove('active'); btn.classList.remove('active'); btn.textContent='START SESSION';
+    vsStatus('TAP TO START VOICE SESSION');
+    vsTranscript('Session ended.');
+  }
+}
+
+function vsListen(){
+  if(!S.voiceSessionOn) return;
+  vsStatus('Listening…');
+  document.getElementById('mic-ib').classList.add('listening');
+  window.jane.startListening();
+}
+
+// ══════════════════════════════════════════════════════════
+//  SCREEN / OVERLAY / ISLAND
+// ══════════════════════════════════════════════════════════
+function toggleScreen(){
+  S.scrOn=!S.scrOn;
+  document.getElementById('screen-ib').classList.toggle('on',S.scrOn);
+  document.getElementById('scr-t').classList.toggle('on',S.scrOn);
+  window.jane.setScreenConsent(S.scrOn);
+  if (S.scrOn) setSb('Screen access ON — say "what\'s on my screen?" to analyze it',S.connected);
+  else setSb('Screen access OFF',S.connected);
+}
+function toggleScr(){toggleScreen();}
+function toggleOverlay(){S.overlayOn=!S.overlayOn;document.getElementById('ovl-btn').classList.toggle('on',S.overlayOn);window.jane.toggleOverlay(S.overlayOn);}
+function toggleIsland(){S.islandOn=!S.islandOn;document.getElementById('island-t').classList.toggle('on',S.islandOn);window.jane.toggleIsland(S.islandOn);}
+
+// ══════════════════════════════════════════════════════════
+//  APPS
+// ══════════════════════════════════════════════════════════
+const QUICK=[
+  {n:'Notepad',cmd:'notepad',s:`<svg viewBox="0 0 20 20" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z"/><path d="M16 6.5l2 2-6 6H9v-3l7-5z"/></svg>`},
+  {n:'Chrome',cmd:'chrome',s:`<svg viewBox="0 0 20 20" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="3"/><circle cx="10" cy="10" r="7.5"/><path d="M10 7h7.5M4.6 13.5L8 7M10 13l-3.4 5.9"/></svg>`},
+  {n:'Explorer',cmd:'explorer',s:`<svg viewBox="0 0 20 20" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"><path d="M3 7a2 2 0 012-2h4l2 3h6a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>`},
+  {n:'VS Code',cmd:'code',s:`<svg viewBox="0 0 20 20" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"><path d="M15 2L7 10l8 8M3 7l4 3-4 3"/></svg>`},
+  {n:'Terminal',cmd:'cmd',s:`<svg viewBox="0 0 20 20" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="16" height="14" rx="2"/><path d="M6 9l4 3-4 3M13 15h4"/></svg>`},
+  {n:'Task Mgr',cmd:'taskmgr',s:`<svg viewBox="0 0 20 20" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M7 9v4M10 7v6M13 11v2"/></svg>`},
+];
+function buildQuickApps(){
+  const g=document.getElementById('ag');
+  QUICK.forEach(a=>{const t=document.createElement('div');t.className='atile';t.innerHTML=`${a.s}<span class="atile-n">${a.n}</span>`;t.onclick=()=>sendCmd(`Open ${a.n}`);g.appendChild(t);});
+}
+function gSearch(){const q=document.getElementById('g-in').value.trim();if(!q)return;sendCmd(`Search Google for "${q}"`);document.getElementById('g-in').value='';sw('p-chat',document.querySelector('[data-p="p-chat"]'));}
+function lApp(){const a=document.getElementById('app-in').value.trim();if(!a)return;sendCmd(`Open ${a}`);document.getElementById('app-in').value='';sw('p-chat',document.querySelector('[data-p="p-chat"]'));}
+
+// ══════════════════════════════════════════════════════════
+//  APPROVAL
+// ══════════════════════════════════════════════════════════
+function showAppr(p){
+  document.getElementById('ab-d').innerHTML=`
+    <div class="ab-r"><div class="ab-k">Tool</div><div class="ab-v">${esc(p.tool||'')}</div></div>
+    <div class="ab-r"><div class="ab-k">Module</div><div class="ab-v">${esc(p.moduleId||'')}</div></div>
+    <div class="ab-r"><div class="ab-k">Params</div><div class="ab-v">${esc(JSON.stringify(p.params||{},null,1).slice(0,300))}</div></div>
+    ${p.rationale?`<div class="ab-r"><div class="ab-k">Reason</div><div class="ab-v">${esc(p.rationale)}</div></div>`:''}`;
+  document.getElementById('aov').classList.add('show');
+}
+function respond(ok){
+  document.getElementById('aov').classList.remove('show');
+  if(S.pendingApproval){if(ok)window.jane.approve(S.pendingApproval);else window.jane.deny(S.pendingApproval);S.pendingApproval=null;}
+}
+
+// ══════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════
+function setSb(msg,connected){
+  document.getElementById('sb-txt').textContent=msg;
+  const d=document.getElementById('sb-d');
+  d.className='sb-dot '+(connected===true?'on':connected===false?'':'pulse');
+}
+function sendCmd(txt){const i=document.getElementById('msg-in');i.value=txt;sendMsg();}
+function ms(){return document.getElementById('msgs');}
+function scrollB(){const m=ms();requestAnimationFrame(()=>{m.scrollTop=m.scrollHeight;});}
+function ts(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmt(txt){
+  let s=esc(txt);
+  s=s.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre><code>${c.trim()}</code></pre>`);
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\n/g,'<br>');return s;
+}
+// ══════════════════════════════════════════════════════════
+//  PERSONALIZATION
+// ══════════════════════════════════════════════════════════
+let P = {}; // current prefs
+
+async function loadPersonalization() {
+  P = await window.jane.getPrefs().catch(() => ({}));
+  applyPrefsToUI(P);
+  applyTheme(P.theme || 'original', P.accentColor || '#7c3aed');
+  // Restore new mode states
+  if (P.thinkExtended) { thinkExtended = true; document.getElementById('think-t')?.classList.add('on'); }
+  if (P.recallMode)    { recallMode = true;    document.getElementById('recall-t')?.classList.add('on'); }
+  if (P.lewdMode)      { lewdMode = true;      document.getElementById('lewd-t')?.classList.add('on'); }
+  if (P.autoTune)      { autoTune = true;      document.getElementById('tune-t')?.classList.add('on'); document.getElementById('tune-params').style.display = 'block'; }
+  if (P.uiFont)        { document.getElementById('font-sel').value = P.uiFont; setFont(P.uiFont); }
+  renderModeBadges();
+}
+
+function applyPrefsToUI(p) {
+  if (p.userName)           document.getElementById('pf-username').value    = p.userName;
+  if (p.aiName)             document.getElementById('pf-ainame').value      = p.aiName;
+  if (p.wakeWord)           document.getElementById('pf-wakeword').value     = p.wakeWord;
+  if (p.customInstructions) document.getElementById('pf-instructions').value = p.customInstructions;
+  if (p.tone)               setTone(p.tone, false);
+  if (p.accentColor) {
+    document.getElementById('accent-picker').value = p.accentColor;
+    document.getElementById('accent-hex').value    = p.accentColor;
+  }
+  if (p.theme) setThemeSwatch(p.theme);
+  // Auto switch toggle
+  if (p.autoModelSwitch !== undefined) {
+    document.getElementById('auto-sw-t').classList.toggle('on', p.autoModelSwitch);
+  }
+}
+
+function setTone(tone, save=true) {
+  ['balanced','casual','professional','direct'].forEach(t => {
+    document.getElementById(`tone-${t}`)?.classList.toggle('on', t === tone);
+  });
+  P.tone = tone;
+}
+
+function toggleAutoSwitch() {
+  P.autoModelSwitch = !P.autoModelSwitch;
+  document.getElementById('auto-sw-t').classList.toggle('on', P.autoModelSwitch);
+}
+
+async function savePersonalization() {
+  const updates = {
+    userName:           document.getElementById('pf-username').value.trim()    || 'User',
+    aiName:             document.getElementById('pf-ainame').value.trim()      || 'Jane',
+    wakeWord:           document.getElementById('pf-wakeword').value.trim()    || 'Hey Jane',
+    customInstructions: document.getElementById('pf-instructions').value.trim(),
+    tone:               P.tone || 'balanced',
+    theme:              P.theme || 'original',
+    accentColor:        P.accentColor || '#7c3aed',
+    autoModelSwitch:    P.autoModelSwitch !== false,
+  };
+  P = { ...P, ...updates };
+  await window.jane.setPrefs(updates);
+  setSb('Preferences saved', S.connected);
+  // Flash save button
+  const btn = document.querySelector('.pf-save');
+  if (btn) { btn.textContent = 'SAVED ✓'; setTimeout(() => { btn.textContent = 'SAVE PREFERENCES'; }, 1800); }
+}
+
+// ══════════════════════════════════════════════════════════
+//  COLOR THEMES
+// ══════════════════════════════════════════════════════════
+function setThemeSwatch(theme) {
+  ['original','white','custom'].forEach(t => {
+    document.getElementById(`sw-${t}`)?.classList.toggle('on', t === theme);
+  });
+  P.theme = theme;
+}
+
+function setTheme(theme) {
+  setThemeSwatch(theme);
+  applyTheme(theme, P.accentColor || '#7c3aed');
+}
+
+function applyTheme(theme, accent) {
+  document.body.classList.remove('theme-white','theme-original','theme-custom');
+  if (theme === 'white') document.body.classList.add('theme-white');
+  if (accent) applyAccent(accent);
+}
+
+function applyAccent(hex) {
+  if (!/^#[0-9a-f]{6}$/i.test(hex)) return;
+  P.accentColor = hex;
+  document.documentElement.style.setProperty('--purple', hex);
+  // Derive purple2 (slightly darker), purple3 (transparent tint)
+  document.documentElement.style.setProperty('--purple2', darken(hex, 15));
+  document.documentElement.style.setProperty('--purple3', hex + '1e');
+  document.documentElement.style.setProperty('--purple4', hex + '0d');
+  document.documentElement.style.setProperty('--purple-g', hex + '40');
+  document.documentElement.style.setProperty('--custom-accent', hex);
+}
+
+function darken(hex, pct) {
+  let [r,g,b] = [1,3,5].map(i => parseInt(hex.slice(i,i+2),16));
+  r = Math.max(0, r - Math.round(r*pct/100));
+  g = Math.max(0, g - Math.round(g*pct/100));
+  b = Math.max(0, b - Math.round(b*pct/100));
+  return `#${[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('')}`;
+}
+
+function onAccentPick(hex) {
+  document.getElementById('accent-hex').value = hex;
+  applyAccent(hex);
+  if (P.theme !== 'custom') setTheme('custom');
+}
+
+function onAccentHex(val) {
+  if (/^#[0-9a-f]{6}$/i.test(val)) {
+    document.getElementById('accent-picker').value = val;
+    applyAccent(val);
+    if (P.theme !== 'custom') setTheme('custom');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  AUTO MODEL SWITCH TOAST
+// ══════════════════════════════════════════════════════════
+function showAutoSwitchToast(from, to) {
+  const t = document.getElementById('auto-switch-toast');
+  document.getElementById('ast-txt').textContent = `Switched ${from} → ${to} (refusal detected)`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+// Listen for auto-switch events from main
+window.jane.on('model:auto_switched', d => {
+  showAutoSwitchToast(d.from, d.to);
+  // Update model pill
+  document.getElementById('m-name').textContent = d.to;
+  S.model = d.to;
+});
+
+// ══════════════════════════════════════════════════════════
+//  DOWNLOAD PROGRESS — real percentage bar
+// ══════════════════════════════════════════════════════════
+window.jane.on('ollama:pull:progress', d => {
+  document.getElementById('mm-pull-row').classList.add('on');
+  document.getElementById('mm-pull-lbl').textContent = d.status || `Downloading ${d.model}…`;
+  if (d.pct !== undefined) {
+    const bar = document.getElementById('mm-pull-inner');
+    const lbl = document.getElementById('mm-pull-pct');
+    if (bar) { bar.style.width = d.pct + '%'; bar.style.animation = 'none'; }
+    if (lbl) lbl.textContent = d.pct + '%';
+  }
+});
+
+init();
+</script>
+</body>
+</html>

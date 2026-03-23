@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
+<title>Activate Jane</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Inter', sans-serif; background: #080808; color: #fff; -webkit-font-smoothing: antialiased; user-select: none; }
+#tb { height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; -webkit-app-region: drag; border-bottom: 1px solid #1a1a1a; }
+.tb-brand { font-family: 'Space Mono', monospace; font-size: 11px; color: #444; letter-spacing: .08em; }
+.wbtns { display: flex; gap: 3px; -webkit-app-region: no-drag; }
+.wbtn { width: 24px; height: 24px; border: none; background: transparent; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #444; font-size: 11px; transition: all .15s; }
+.wbtn:hover { background: #1a1a1a; color: #fff; }
+.wbtn.x:hover { background: rgba(239,68,68,.15); color: #ef4444; }
+main { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100% - 36px); padding: 32px 40px; gap: 36px; }
+.hdr { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.sparkle-wrap { width: 52px; height: 52px; border: 1px solid #2a2a2a; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: #111; position: relative; }
+.sparkle-ring { position: absolute; inset: -6px; border: 1px solid rgba(124,58,237,.15); border-radius: 20px; }
+.hdr-title { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; letter-spacing: .04em; color: #fff; }
+.hdr-sub { font-size: 13px; color: #555; max-width: 320px; line-height: 1.6; }
+.card { width: 100%; max-width: 420px; background: #0e0e0e; border: 1px solid #1f1f1f; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 20px; }
+.card-label { font-size: 10px; font-family: 'Space Mono', monospace; letter-spacing: .12em; text-transform: uppercase; color: #444; margin-bottom: -12px; }
+.key-row { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: center; gap: 6px; }
+.key-seg { background: #0a0a0a; border: 1px solid #222; border-radius: 8px; padding: 11px 6px; text-align: center; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: #fff; letter-spacing: .2em; outline: none; transition: border-color .15s, box-shadow .15s; text-transform: uppercase; width: 100%; }
+.key-seg::placeholder { color: #2a2a2a; letter-spacing: .1em; }
+.key-seg:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.12); }
+.key-seg.ok { border-color: rgba(124,58,237,.4); color: #a78bfa; }
+.key-dash { color: #2a2a2a; font-family: 'Space Mono', monospace; font-size: 16px; text-align: center; }
+.fb { display: none; font-size: 12px; padding: 10px 12px; border-radius: 8px; align-items: center; gap: 8px; }
+.fb.err { display: flex; background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.2); color: #f87171; }
+.fb.ok2 { display: flex; background: rgba(124,58,237,.07); border: 1px solid rgba(124,58,237,.2); color: #a78bfa; }
+.btn-main { width: 100%; padding: 13px; background: #7c3aed; border: none; border-radius: 10px; font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: .08em; color: #fff; cursor: pointer; transition: all .15s; }
+.btn-main:hover:not(:disabled) { background: #6d28d9; }
+.btn-main:disabled { background: #1a1a1a; color: #333; cursor: not-allowed; }
+.spin { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.footer-note { text-align: center; font-size: 11px; color: #2d2d2d; line-height: 1.7; padding-top: 4px; border-top: 1px solid #141414; }
+.footer-note span { color: #444; }
+</style>
+</head>
+<body>
+<div id="tb">
+  <span class="tb-brand">VISRODECK · JANE</span>
+  <div class="wbtns">
+    <button class="wbtn x" onclick="window.jane.close()">✕</button>
+  </div>
+</div>
+<main>
+  <div class="hdr">
+    <div class="sparkle-wrap">
+      <div class="sparkle-ring"></div>
+      <svg viewBox="0 -2 32 32" xmlns="http://www.w3.org/2000/svg"
+        style="width:37px;height:37px;fill:#6d41be;filter:drop-shadow(0 0 10px rgba(0,0,0,.6))">
+        <path d="M4 6h10v4h-4v4h4v4h-4v4h4v4h-10v-20zM22 6v4h-4v4h4v4h-4v4h4v4h6v-20h-6z"/>
+      </svg>
+    </div>
+    <div class="hdr-title">ACTIVATE JANE</div>
+    <div class="hdr-sub">Enter your 16-character product key to activate Jane on this device.</div>
+  </div>
+  <div class="card">
+    <div class="card-label">Product Key</div>
+    <div class="key-row">
+      <input class="key-seg" id="k0" maxlength="4" placeholder="XXXX" oninput="onIn(0)" onkeydown="onKD(event,0)">
+      <div class="key-dash">—</div>
+      <input class="key-seg" id="k1" maxlength="4" placeholder="XXXX" oninput="onIn(1)" onkeydown="onKD(event,1)">
+      <div class="key-dash">—</div>
+      <input class="key-seg" id="k2" maxlength="4" placeholder="XXXX" oninput="onIn(2)" onkeydown="onKD(event,2)">
+      <div class="key-dash">—</div>
+      <input class="key-seg" id="k3" maxlength="4" placeholder="XXXX" oninput="onIn(3)" onkeydown="onKD(event,3)">
+    </div>
+    <div class="fb" id="fb"></div>
+    <button class="btn-main" id="btn" onclick="activate()" disabled>ACTIVATE</button>
+    <div class="footer-note">
+      License will be bound to this device's hardware.<br>
+      <span>Visrodeck Technology · Emtypyie &amp; Bynatics · 2025</span>
+    </div>
+  </div>
+</main>
+<script>
+const segs = [0,1,2,3].map(i => document.getElementById('k'+i));
+function onIn(i) {
+  segs[i].value = segs[i].value.replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,4);
+  segs[i].classList.toggle('ok', segs[i].value.length===4);
+  if (segs[i].value.length===4 && i<3) segs[i+1].focus();
+  document.getElementById('btn').disabled = !segs.every(s=>s.value.length===4);
+  clrFb();
+}
+function onKD(e, i) {
+  if (e.key==='Backspace' && segs[i].value==='' && i>0) segs[i-1].focus();
+  if (e.key==='Enter') activate();
+}
+function clrFb() { const f=document.getElementById('fb'); f.className='fb'; f.textContent=''; }
+function setFb(type, msg) { const f=document.getElementById('fb'); f.className='fb '+type; f.textContent=msg; }
+async function activate() {
+  const key = segs.map(s=>s.value.toUpperCase()).join('-');
+  const btn = document.getElementById('btn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>VALIDATING…'; clrFb();
+  try {
+    const r = await window.jane.activate(key);
+    if (r.success) { setFb('ok2','✦  Activated — loading Jane…'); }
+    else { setFb('err','✕  '+(r.reason||'Invalid key')); btn.disabled=false; btn.textContent='ACTIVATE'; }
+  } catch(e) { setFb('err','✕  Error: '+e.message); btn.disabled=false; btn.textContent='ACTIVATE'; }
+}
+segs[0].focus();
+</script>
+</body>
+</html>

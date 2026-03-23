@@ -1,0 +1,98 @@
+{
+  "name": "jane",
+  "productName": "Jane",
+  "version": "1.8.0",
+  "description": "Jane — Visrodeck AI System Operator",
+  "author": {
+    "name": "Visrodeck Technology",
+    "email": "contact@visrodeck.tech"
+  },
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start":    "electron .",
+    "dev":      "electron . --dev",
+    "dist":     "electron-builder --win --x64",
+    "dist:dir": "electron-builder --win --x64 --dir"
+  },
+  "dependencies": {
+    "ws":   "^8.16.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "electron":         "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId":       "tech.visrodeck.jane",
+    "productName": "Jane",
+    "copyright":   "© 2025 Visrodeck Technology. Emtypyie & Bynatics.",
+
+    "directories": {
+      "output":         "../../dist",
+      "buildResources": "build"
+    },
+
+    "files": [
+      "**/*",
+      "!**/node_modules/electron-builder/**",
+      "!build/**",
+      "!scripts/**",
+      "!*.sh",
+      "!*.bat"
+    ],
+
+    "extraResources": [
+      {
+        "from": "../../vre",
+        "to":   "vre",
+        "filter": ["**/*", "!**/*.log"]
+      },
+      {
+        "from": "../../modules/jane",
+        "to":   "modules/jane",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../../config",
+        "to":   "config",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../../start.js",
+        "to":   "start.js"
+      },
+      {
+        "from": "../../package.json",
+        "to":   "vre-package.json"
+      }
+    ],
+
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.ico",
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+
+    "nsis": {
+      "oneClick":                          false,
+      "perMachine":                        true,
+      "allowElevation":                    true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon":                     "build/icon.ico",
+      "uninstallerIcon":                   "build/icon.ico",
+      "installerHeader":                   "build/header.bmp",
+      "installerSidebar":                  "build/sidebar.bmp",
+      "createDesktopShortcut":             true,
+      "createStartMenuShortcut":           true,
+      "shortcutName":                      "Jane",
+      "menuCategory":                      "Visrodeck",
+      "artifactName":                      "Jane-Setup-${version}.exe",
+      "include":                           "build/installer.nsh",
+      "license":                           "build/license.txt",
+      "deleteAppDataOnUninstall":          false
+    }
+  }
+}

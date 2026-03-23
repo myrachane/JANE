@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data: file:;">
+<title>Jane</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  height:100%;overflow:hidden;
+  background:#06060a;
+  font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;user-select:none;
+}
+
+/* ── Background glow ─── */
+body::before {
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 60%, rgba(124,92,252,.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+#root {
+  height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px;position:relative;
+}
+
+/* ── Logo ─── */
+#logo-wrap {
+  display:flex;flex-direction:column;align-items:center;gap:22px;
+  margin-bottom:52px;
+  animation:rise .7s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+#logo-img-wrap {
+  width:80px;height:80px;border-radius:22px;
+  background:linear-gradient(145deg,#1a1025,#0f0a1a);
+  border:1px solid rgba(124,92,252,.25);
+  box-shadow:
+    0 0 0 1px rgba(124,92,252,.1),
+    0 16px 56px rgba(124,92,252,.35),
+    0 4px 16px rgba(0,0,0,.8);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  animation:float 3.5s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+/* User drops their PNG/ICO here — fallback to SVG mark */
+#logo-img{width:56px;height:56px;object-fit:contain;display:none}
+#logo-svg{display:flex;align-items:center;justify-content:center}
+
+#app-name {
+  font-size:11px;font-weight:700;letter-spacing:.22em;
+  color:rgba(200,180,255,.35);
+  font-family:ui-monospace,monospace;
+  text-transform:uppercase;
+}
+
+/* ── Progress ─── */
+#progress-area{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  animation:rise .7s .25s cubic-bezier(.2,.8,.3,1) both;
+}
+
+#status {
+  font-size:11px;color:rgba(180,160,255,.4);
+  font-family:ui-monospace,monospace;letter-spacing:.06em;
+  min-height:16px;transition:opacity .3s;
+}
+
+#bar-track {
+  width:200px;height:2px;background:rgba(124,92,252,.12);
+  border-radius:2px;overflow:hidden;
+  position:relative;
+}
+#bar-fill {
+  height:100%;width:0%;
+  background:linear-gradient(90deg,#7c5cfc,#a78bfa);
+  border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 10px rgba(124,92,252,.7);
+}
+/* Shimmer on bar */
+#bar-fill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.3) 50%,transparent 100%);
+  animation:shimmer 1.6s infinite;
+}
+@keyframes shimmer{from{transform:translateX(-200%)}to{transform:translateX(200%)}}
+
+/* ── Version ─── */
+#ver{
+  position:fixed;bottom:18px;
+  font-size:9px;letter-spacing:.1em;
+  color:rgba(255,255,255,.1);font-family:ui-monospace,monospace;
+}
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="logo-wrap">
+    <div id="logo-img-wrap">
+      <!-- Try to load user's splash-logo.png from assets -->
+      <img id="logo-img" src="./splash-logo.png"
+        onerror="this.style.display='none';document.getElementById('logo-svg').style.display='flex'"
+        onload="this.style.display='block';document.getElementById('logo-svg').style.display='none'"
+        alt="Jane">
+      <!-- Fallback: Visrodeck H mark SVG -->
+      <div id="logo-svg">
+        <svg width="42" height="42" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h9v4H9v4h4v4H9v4h4v4H4V6z" fill="url(#g1)"/>
+          <path d="M19 6v4h-4v4h4v4h-4v4h4v4h9V6h-9z" fill="url(#g2)"/>
+          <defs>
+            <linearGradient id="g1" x1="4" y1="6" x2="13" y2="26" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#c4b5fd"/>
+              <stop offset="100%" stop-color="#7c5cfc"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="15" y1="6" x2="28" y2="26" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#5b3fd4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+    <div id="app-name">Jane · VRE</div>
+  </div>
+
+  <div id="progress-area">
+    <div id="status">Initializing…</div>
+    <div id="bar-track"><div id="bar-fill"></div></div>
+  </div>
+</div>
+<div id="ver">v1.8.0 · Visrodeck Technology</div>
+
+<script>
+const stages = [
+  [0,   'Initializing runtime…'],
+  [18,  'Loading VRE kernel…'],
+  [36,  'Checking AI engine…'],
+  [54,  'Warming llama-server…'],
+  [70,  'Applying hardware config…'],
+  [88,  'Connecting services…'],
+  [100, 'Ready'],
+];
+
+const fill   = document.getElementById('bar-fill');
+const status = document.getElementById('status');
+let i = 0;
+
+function tick() {
+  if (i >= stages.length) return;
+  const [pct, msg] = stages[i++];
+  fill.style.width = pct + '%';
+  status.textContent = msg;
+  if (i < stages.length) {
+    setTimeout(tick, 320 + Math.random() * 480);
+  }
+}
+setTimeout(tick, 150);
+
+// Main process sends this when everything is actually ready
+window.jane?.on('splash:done', () => {
+  fill.style.width = '100%';
+  status.textContent = 'Ready';
+});
+</script>
+</body>
+</html>

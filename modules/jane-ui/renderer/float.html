@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
+<title>Jane Float</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:rgba(8,7,14,0.96);
+  --s1:#0f0d18;--s2:#161325;--s3:#1e1a2e;
+  --b1:rgba(124,92,252,.12);--b2:rgba(124,92,252,.2);--b3:rgba(124,92,252,.3);
+  --t1:#ede8ff;--t2:#a090c8;--t3:#504870;
+  --acc:#7c5cfc;--acc2:#5b3fd4;--acc-dim:rgba(124,92,252,.15);
+  --green:#22c55e;--red:#f43f5e;
+  --r:10px;
+}
+html,body{
+  height:100%;width:100%;background:transparent;overflow:hidden;
+  font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;
+}
+
+/* ── Outer shell ──────────────────────────────────────────── */
+#float{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:360px;
+  background:var(--bg);
+  border:1px solid var(--b1);
+  border-bottom:none;
+  border-radius:16px 16px 0 0;
+  overflow:hidden;
+  box-shadow:
+    0 -4px 40px rgba(124,92,252,.18),
+    0 -1px 0 rgba(124,92,252,.15),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  transition:height .2s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Drag handle ─────────────────────────────────────────── */
+#drag-handle{
+  display:flex;justify-content:center;padding:8px 0 0;
+  cursor:grab;-webkit-app-region:drag;
+}
+#drag-bar{
+  width:28px;height:2.5px;border-radius:2px;
+  background:var(--b2);transition:background .2s;
+}
+#float:hover #drag-bar{background:var(--b3)}
+
+/* ── Pill ────────────────────────────────────────────────── */
+#pill{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 12px 10px;
+  cursor:pointer;-webkit-app-region:drag;
+}
+
+/* Jane icon — purple gradient hexagon feel */
+.j-icon{
+  width:32px;height:32px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(145deg,#9b7aff,#5b3fd4);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 1px rgba(124,92,252,.4), 0 3px 12px rgba(124,92,252,.35);
+  position:relative;overflow:hidden;
+}
+.j-icon::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15) 0%,transparent 60%);
+}
+.j-icon svg{position:relative;z-index:1}
+
+.pill-text{flex:1;min-width:0}
+.pill-name{font-size:12px;font-weight:700;color:var(--t1);letter-spacing:.01em}
+.pill-sub{font-size:10px;color:var(--t3);margin-top:1px}
+
+/* Status indicator */
+.dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  background:var(--t3);transition:all .35s;
+}
+.dot.ok  {background:var(--green);box-shadow:0 0 8px rgba(34,197,94,.5)}
+.dot.busy{background:var(--acc);box-shadow:0 0 8px rgba(124,92,252,.6);animation:dpulse 1.2s infinite}
+.dot.err {background:var(--red)}
+@keyframes dpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+
+/* Expand button */
+#xbtn{
+  -webkit-app-region:no-drag;
+  width:26px;height:26px;border:1px solid var(--b1);background:var(--s1);
+  border-radius:7px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;color:var(--t3);
+  transition:all .15s;
+}
+#xbtn:hover{background:var(--s2);border-color:var(--b2);color:var(--t2)}
+
+/* ── Panel ───────────────────────────────────────────────── */
+#panel{
+  display:none;-webkit-app-region:no-drag;
+  border-top:1px solid rgba(124,92,252,.1);
+}
+
+/* Quick actions */
+#chips{
+  display:flex;gap:5px;padding:9px 12px 0;
+  overflow-x:auto;scrollbar-width:none;
+}
+#chips::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;display:flex;align-items:center;gap:5px;
+  background:var(--s1);
+  border:1px solid var(--b1);
+  border-radius:20px;padding:5px 11px;
+  cursor:pointer;font-size:10px;color:var(--t3);
+  transition:all .15s;white-space:nowrap;
+  font-weight:500;
+}
+.chip:hover{
+  border-color:var(--b3);color:#c4b5fd;
+  background:var(--acc-dim);
+}
+.chip svg{flex-shrink:0;opacity:.6}
+.chip:hover svg{opacity:1}
+
+/* Messages */
+#msgs{
+  max-height:170px;overflow-y:auto;
+  padding:8px 12px;
+  display:flex;flex-direction:column;gap:5px;
+  scrollbar-width:thin;scrollbar-color:rgba(124,92,252,.15) transparent;
+}
+#msgs::-webkit-scrollbar{width:2px}
+#msgs::-webkit-scrollbar-thumb{background:rgba(124,92,252,.2);border-radius:2px}
+
+.msg{
+  max-width:90%;padding:7px 11px;border-radius:10px;
+  font-size:11.5px;line-height:1.55;
+  animation:msgIn .15s ease;
+}
+@keyframes msgIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.msg.u{
+  align-self:flex-end;
+  background:rgba(124,92,252,.18);
+  border:1px solid rgba(124,92,252,.3);
+  color:#ddd6fe;
+  border-bottom-right-radius:3px;
+}
+.msg.j{
+  align-self:flex-start;
+  background:var(--s1);
+  border:1px solid rgba(124,92,252,.1);
+  color:var(--t1);
+  border-bottom-left-radius:3px;
+}
+.msg-lbl{
+  font-size:8.5px;letter-spacing:.1em;
+  font-family:ui-monospace,monospace;
+  color:var(--acc);margin-bottom:4px;font-weight:700;
+}
+.typing-dots{display:flex;gap:3px;padding:2px 0}
+.typing-dots span{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--acc);opacity:.5;
+  animation:td 1.1s infinite;
+}
+.typing-dots span:nth-child(2){animation-delay:.16s}
+.typing-dots span:nth-child(3){animation-delay:.32s}
+@keyframes td{0%,80%,100%{transform:scale(.6);opacity:.25}35%{transform:scale(1);opacity:.9}}
+
+/* Input row */
+#inp-row{padding:9px 12px 12px;display:flex;align-items:flex-end;gap:6px}
+#inp{
+  flex:1;
+  background:var(--s1);
+  border:1px solid var(--b1);
+  border-radius:9px;padding:8px 11px;
+  color:var(--t1);font-size:11.5px;font-family:inherit;
+  outline:none;resize:none;min-height:34px;max-height:86px;line-height:1.4;
+  transition:border-color .15s;
+  -webkit-user-select:text;user-select:text;
+}
+#inp:focus{border-color:var(--b3);background:var(--s2)}
+#inp::placeholder{color:var(--t3)}
+.ib{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--b1);
+  background:var(--s1);color:var(--t3);cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.ib:hover{background:var(--s2);border-color:var(--b2);color:var(--t2)}
+.ib.send{
+  background:var(--acc);border-color:var(--acc2);color:#fff;
+  box-shadow:0 2px 10px rgba(124,92,252,.35);
+}
+.ib.send:hover{background:var(--acc2)}
+.ib.mic-on{
+  background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.3);
+  color:var(--red);animation:dpulse 1s infinite;
+}
+</style>
+</head>
+<body>
+<div id="float">
+  <div id="drag-handle"><div id="drag-bar"></div></div>
+
+  <div id="pill">
+    <div class="j-icon">
+      <svg width="16" height="16" viewBox="0 0 32 32" fill="none">
+        <path d="M4 6h9v4H9v4h4v4H9v4h4v4H4V6z" fill="rgba(255,255,255,.92)"/>
+        <path d="M19 6v4h-4v4h4v4h-4v4h4v4h9V6h-9z" fill="rgba(255,255,255,.7)"/>
+      </svg>
+    </div>
+    <div class="pill-text">
+      <div class="pill-name" id="pname">Jane</div>
+      <div class="pill-sub" id="psub">Tap to open</div>
+    </div>
+    <button id="xbtn">
+      <svg id="xico" width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 8l3.5-3.5L9 8"/>
+      </svg>
+    </button>
+    <div class="dot" id="dot"></div>
+  </div>
+
+  <div id="panel">
+    <div id="chips">
+      <div class="chip" data-q="What's on my screen?">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="1" y="2" width="14" height="10" rx="1.5"/><path d="M5 14h6M8 12v2"/>
+        </svg>Screen
+      </div>
+      <div class="chip" data-q="Open Chrome browser">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2.5"/>
+          <line x1="8" y1="5.5" x2="14" y2="5.5"/><line x1="5.5" y1="10" x2="2.5" y2="15"/><line x1="10.5" y1="10" x2="13.5" y2="15"/>
+        </svg>Browser
+      </div>
+      <div class="chip" data-q="Run a shell command">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="1" y="2" width="14" height="12" rx="2"/>
+          <path d="M4 6l2.5 2.5L4 11M9 11h3"/>
+        </svg>Shell
+      </div>
+      <div class="chip" data-q="Summarize my clipboard">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="3" y="2" width="10" height="13" rx="1.5"/>
+          <rect x="5.5" y="1" width="5" height="2.5" rx="1" fill="currentColor" opacity=".3"/>
+          <path d="M5 8h6M5 11h4"/>
+        </svg>Clipboard
+      </div>
+    </div>
+
+    <div id="msgs"></div>
+
+    <div id="inp-row">
+      <textarea id="inp" rows="1" placeholder="Ask Jane…"></textarea>
+      <button class="ib" id="mic" title="Voice">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="5.5" y="1" width="5" height="8" rx="2.5"/>
+          <path d="M2.5 8a5.5 5.5 0 0011 0M8 13.5v2M5.5 15.5h5"/>
+        </svg>
+      </button>
+      <button class="ib send" id="send" title="Send">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2L2 6.5l5 1.5 1.5 5L14 2z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const api = window.jane;
+  let expanded = false;
+  let aiName = 'Jane';
+  let streamNode = null;
+
+  api.getPrefs().then(p => {
+    if (p.aiName) { aiName = p.aiName; document.getElementById('pname').textContent = aiName; }
+  }).catch(()=>{});
+
+  // ── Expand / collapse ─────────────────────────────────
+  function setExpanded(v) {
+    expanded = v;
+    document.getElementById('panel').style.display = v ? 'block' : 'none';
+    // Flip chevron
+    const ico = document.getElementById('xico');
+    ico.querySelector('path').setAttribute('d', v ? 'M2 3.5l3.5 3.5L9 3.5' : 'M2 8l3.5-3.5L9 8');
+    document.getElementById('psub').textContent = v ? 'Active' : 'Tap to open';
+    api.floatResize?.(360, v ? 410 : 66);
+    if (v) setTimeout(() => document.getElementById('inp').focus(), 40);
+  }
+
+  document.getElementById('pill').addEventListener('click', e => {
+    if (e.target.closest('#xbtn')) return;
+    setExpanded(!expanded);
+  });
+  document.getElementById('xbtn').addEventListener('click', e => {
+    e.stopPropagation(); setExpanded(!expanded);
+  });
+
+  // ── Chips ─────────────────────────────────────────────
+  document.querySelectorAll('.chip').forEach(c =>
+    c.addEventListener('click', () => send(c.dataset.q)));
+
+  // ── Input ─────────────────────────────────────────────
+  document.getElementById('send').addEventListener('click', doSend);
+  document.getElementById('inp').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+  });
+  document.getElementById('inp').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 86) + 'px';
+  });
+
+  function doSend() {
+    const el = document.getElementById('inp');
+    const t = el.value.trim(); if (!t) return;
+    el.value = ''; el.style.height = '';
+    send(t);
+  }
+
+  function send(text) {
+    if (!expanded) setExpanded(true);
+    addMsg('u', text); showTyping();
+    setDot('busy'); setPSub('Thinking…');
+    api.floatSend(text);
+  }
+
+  // ── Mic ───────────────────────────────────────────────
+  document.getElementById('mic').addEventListener('click', () => {
+    document.getElementById('mic').classList.add('mic-on');
+    setDot('busy'); setPSub('Listening…');
+    api.startListening?.();
+  });
+
+  // ── Messages ──────────────────────────────────────────
+  function addMsg(role, text) {
+    removeTyping(); streamNode = null;
+    const msgs = document.getElementById('msgs');
+    const el = document.createElement('div');
+    el.className = 'msg ' + role;
+    if (role === 'j') {
+      const lbl = document.createElement('div');
+      lbl.className = 'msg-lbl'; lbl.textContent = aiName.toUpperCase();
+      const tn = document.createTextNode(text);
+      el.appendChild(lbl); el.appendChild(tn);
+      streamNode = tn;
+    } else { el.textContent = text; }
+    msgs.appendChild(el);
+    msgs.scrollTop = msgs.scrollHeight;
+    const all = msgs.querySelectorAll('.msg');
+    if (all.length > 18) all[0].remove();
+    return el;
+  }
+
+  function appendChunk(chunk) {
+    removeTyping();
+    const msgs = document.getElementById('msgs');
+    let last = msgs.querySelector('.msg.j:last-child');
+    if (!last) { last = addMsg('j', ''); }
+    if (streamNode && streamNode.parentNode === last) {
+      streamNode.textContent += chunk;
+    } else {
+      const tn = document.createTextNode(chunk);
+      last.appendChild(tn); streamNode = tn;
+    }
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTyping() {
+    removeTyping();
+    const msgs = document.getElementById('msgs');
+    const el = document.createElement('div');
+    el.className = 'msg j typing-wrap';
+    el.innerHTML = '<div class="msg-lbl">' + aiName.toUpperCase() + '</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+    msgs.appendChild(el); msgs.scrollTop = msgs.scrollHeight;
+  }
+  function removeTyping() { document.querySelectorAll('.typing-wrap').forEach(e=>e.remove()); }
+
+  function setDot(c) { document.getElementById('dot').className = 'dot ' + (c||''); }
+  function setPSub(t) { document.getElementById('psub').textContent = t; }
+
+  // ── VRE events ────────────────────────────────────────
+  api.on('chat:chunk', ({text}) => { if(text) appendChunk(text); });
+  api.on('chat:done',  () => { removeTyping(); streamNode=null; setDot('ok'); setPSub('Ready'); });
+  api.on('chat:error', ({error}) => { removeTyping(); streamNode=null; addMsg('j','⚠ '+(error||'Error')); setDot('err'); setPSub('Error'); });
+  api.on('agent:done', () => { setDot('ok'); setPSub('Ready'); streamNode=null; });
+  api.on('status', ({connected, message}) => {
+    setDot(connected?'ok':'err');
+    if(!expanded) setPSub(connected?'Ready':(message||'Offline'));
+  });
+  api.on('voice:transcript', ({transcript,error}) => {
+    document.getElementById('mic').classList.remove('mic-on');
+    if(transcript) send(transcript); else { setDot('ok'); setPSub('Ready'); }
+  });
+
+  setDot(''); setPSub('Starting…');
+})();
+</script>
+</body>
+</html>
