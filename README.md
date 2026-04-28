@@ -1,4 +1,4 @@
-# Jane v1.8.0
+# Jane Papaya {v2.0}
 
 
 ## Quick Start
