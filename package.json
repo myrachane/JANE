@@ -1,8 +1,8 @@
 {
-  "name": "jane-visrodeck",
-  "version": "1.8.0",
+  "name": "jane",
+  "version": "2.0",
   "private": true,
-  "description": "Jane AI — Visrodeck local AI assistant",
+  "description": "Jane AI — Papaya",
   "dependencies": {
     "ws": "^8.18.0",
     "uuid": "^9.0.1"
