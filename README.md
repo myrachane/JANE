@@ -1,10 +1,7 @@
-# Jane v1.8.0 — Visrodeck AI Assistant
+# Jane v1.8.0
 
 
 ## Quick Start
-
-**Windows:** Double-click `start.bat`  
-**Mac/Linux:** Run `./start.sh`
 
 Or manually:
 ```
@@ -59,7 +56,6 @@ jane-complete/
 │       └── vre_client.js
 ├── vre/src/            ← VRE kernel (tools engine)
 ├── config/             ← License & VRE config
-├── start.bat / start.sh
 └── package.json
 ```
 
