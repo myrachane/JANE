@@ -1,9 +1,9 @@
 # Jane
 
 
-## Quick Start
+## Start
 
-Or manually:
+manually:
 ```
 cd modules/jane-ui
 npm install
